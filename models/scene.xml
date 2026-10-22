@@ -1,6 +1,6 @@
 <mujoco model="inchworm_scene">
   <compiler angle="radian" autolimits="true" meshdir="../assets/meshes/visual"/>
-  <option gravity="0 0 -9.81" timestep="0.002"/>  <!-- gravity off for the first visual test -->
+  <option gravity="0 0 -9.81" timestep="0.002"/> 
 
   <asset>
     <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>

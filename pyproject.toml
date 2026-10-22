@@ -5,7 +5,7 @@ requires-python = ">=3.9"
 dependencies = ["mujoco", "numpy"]
 
 [project.optional-dependencies]
-dev = ["trimesh"]
+dev = ["trimesh", "ruff"]
 
 [build-system]
 requires = ["setuptools"]
