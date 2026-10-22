@@ -10,23 +10,11 @@ data = mujoco.MjData(model)
 # IDs
 # ------------------------------------------------------------
 
-ee2_site_id = mujoco.mj_name2id(
-    model,
-    mujoco.mjtObj.mjOBJ_SITE,
-    "ee2_grab"
-)
+ee2_site_id = model.site("ee2_grab").id
 
-block_site_id = mujoco.mj_name2id(
-    model,
-    mujoco.mjtObj.mjOBJ_SITE,
-    "block1_grab"
-)
+block_site_id = model.site("block1_grab").id
 
-weld_id = mujoco.mj_name2id(
-    model,
-    mujoco.mjtObj.mjOBJ_EQUALITY,
-    "ee2_block_weld"
-)
+weld_id = model.equality("ee2_block_weld").id
 
 # ------------------------------------------------------------
 # Grab parameters

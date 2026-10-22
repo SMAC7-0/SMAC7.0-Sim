@@ -29,6 +29,7 @@
         pos="0.0644 0 0.0712"
         euler="0 0 0"
         mass="0.05"
+        group="2"  
       />
       <body name="link1" pos="0 0 0">
         <joint
@@ -49,6 +50,7 @@
           pos="0.0269 0 0.1675"
           euler="0 0 0"
           mass="0.05"
+          group="2"
         />
 
         <body name="link2" pos="0 0 0">
@@ -64,6 +66,7 @@
             pos="-0.0444 0 0.1655"
             euler="0 0 0"
             mass="0.05"
+            group="2" 
           />
 
           <body name="ee2" pos="0 0 0">
@@ -85,6 +88,7 @@
               pos="-0.0439 0 0.0702"
               euler="0 0 0"
               mass="0.05"
+              group="2"
             />
 
             <site
