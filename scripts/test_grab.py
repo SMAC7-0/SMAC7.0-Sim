@@ -2,86 +2,46 @@ import time
 
 import mujoco
 import mujoco.viewer
-import numpy as np
+
+from inchworm_sim.core.world_grid import WorldGrid
+from inchworm_sim.physics.sim_bridge import SimBridge
+
 
 model = mujoco.MjModel.from_xml_path("models/scene.xml")
 data = mujoco.MjData(model)
+world_grid = WorldGrid(
+    block_edge=0.0762,
+    origin_offset=(-0.1381, -0.0181, 0.0),
+)
+bridge = SimBridge(model, data, world_grid)
 
-# ------------------------------------------------------------
-# IDs
-# ------------------------------------------------------------
-
-ee2_site_id = model.site("ee2_grab").id
-
-block_site_id = model.site("block1_grab").id
-
-weld_id = model.equality("ee2_block_weld").id
-
-# ------------------------------------------------------------
-# Grab parameters
-# ------------------------------------------------------------
-
-grab_distance = 0.004  # 2 mm
-grabbed = False
-
-# Time over which the weld becomes stiff
-weld_ramp_time = 0.10  # 100 ms
-weld_timer = 0.0
-
-# Initial and final weld stiffness
-soft_solref = np.array([0.10, 1.0])
-hard_solref = np.array([0.01, 1.0])
+print(
+    "\nInteractive grab demo:\n"
+    "  Move joints with the MuJoCo viewer Control sliders or keyboard shortcuts.\n"
+    "  Move ee2 within 30 mm of a block and press SPACE to grab it.\n"
+    "  Move the held block, then press SPACE again to release and snap it to the 3D grid.\n"
+)
 
 
-# ------------------------------------------------------------
-# Simulation
-# ------------------------------------------------------------
+def key_callback(keycode: int) -> None:
+    """Toggle the ee2 gripper when the viewer's spacebar is pressed."""
+    if keycode != ord(" "):
+        return
+    print("SPACE pressed")
+    if bridge.worm.held_blocks["ee2"] is None:
+        if bridge.release_cooldown == 0.0:
+            bridge.worm.close_gripper("ee2", bridge)
+        else:
+            print(
+                f"GRAB REJECTED: release cooldown "
+                f"{bridge.release_cooldown:.2f} s remaining"
+            )
+    else:
+        bridge.worm.open_gripper("ee2", bridge)
 
-with mujoco.viewer.launch_passive(model, data) as viewer:
+
+with mujoco.viewer.launch_passive(model, data, key_callback=key_callback) as viewer:
     while viewer.is_running():
-        # Update positions before checking grab distance
-        mujoco.mj_forward(model, data)
-
-        ee2_pos = data.site_xpos[ee2_site_id]
-        block_pos = data.site_xpos[block_site_id]
-
-        distance = np.linalg.norm(ee2_pos - block_pos)
-
-        # ----------------------------------------------------
-        # Detect grab
-        # ----------------------------------------------------
-
-        if not grabbed and distance < grab_distance:
-            grabbed = True
-            weld_timer = 0.0
-
-            # Start with a very soft weld
-            model.eq_solref[weld_id] = soft_solref
-
-            # Activate the weld
-            data.eq_active[weld_id] = 1
-
-            print("BLOCK GRABBED")
-            print("Distance:", distance)
-
-        # ----------------------------------------------------
-        # Gradually stiffen the weld
-        # ----------------------------------------------------
-
-        if grabbed and weld_timer < weld_ramp_time:
-            weld_timer += model.opt.timestep
-
-            alpha = min(weld_timer / weld_ramp_time, 1.0)
-
-            # Smooth interpolation from soft -> stiff
-            model.eq_solref[weld_id] = (1.0 - alpha) * soft_solref + alpha * hard_solref
-
-        # ----------------------------------------------------
-        # Step simulation
-        # ----------------------------------------------------
-
-        mujoco.mj_step(model, data)
-
+        bridge.step()
         viewer.sync()
-
         time.sleep(model.opt.timestep)

@@ -23,12 +23,20 @@
   <include file="inchworm.xml"/>
   <include file="block.xml"/>
 
-  <!-- EE2 block attachment -->
+  <!-- Block welds are enabled by the interactive grab script. -->
   <equality>
     <weld
-        name="ee2_block_weld"
+        name="ee2_block1_weld"
         site1="ee2_grab"
         site2="block1_grab"
+        active="false"
+        solref="0.1 1"
+        solimp="0.7 0.9 0.001"
+    />
+    <weld
+        name="ee2_block2_weld"
+        site1="ee2_grab"
+        site2="block2_grab"
         active="false"
         solref="0.1 1"
         solimp="0.7 0.9 0.001"
