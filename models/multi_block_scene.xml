@@ -1,0 +1,41 @@
+<mujoco model="inchworm_scene">
+  <compiler angle="radian" autolimits="true" meshdir="../assets/meshes/visual"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/> 
+
+  <asset>
+    <texture
+        type="skybox"
+        builtin="gradient"
+        rgb1="0.3 0.5 0.7"
+        rgb2="0 0 0"
+        width="512"
+        height="512"
+    />
+
+    <texture
+        name="grid"
+        type="2d"
+        builtin="checker"
+        width="512"
+        height="512"
+        rgb1="0.9 0.9 0.9"
+        rgb2="0.8 0.8 0.8"
+    />
+
+    <material name="grid" texture="grid" texrepeat="8 8"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1"/>
+    <geom
+        name="floor"
+        type="plane"
+        size="2 2 0.01"
+        material="grid"
+        contype="1"
+        conaffinity="1"
+    />
+  </worldbody>
+
+  <include file="inchworm.xml"/>
+</mujoco>

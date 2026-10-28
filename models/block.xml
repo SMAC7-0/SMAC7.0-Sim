@@ -6,7 +6,7 @@
   <worldbody>
     <body name="block1" pos="-0.1 0.02 0.0381">
       <freejoint/>
-      <geom 
+      <!-- <geom 
         type="mesh" 
         mesh="block_mesh" 
         mass="0.01" 
@@ -14,16 +14,16 @@
         conaffinity="1" 
         density="0"
         group="1"
-      />
+      /> -->
 
-      <!-- <geom type="box" 
+      <geom type="box" 
           size="0.0381 0.0381 0.0381" 
           mass="0.01"
           friction="1 0.005 0.0001"
           contype="1"
           conaffinity="1"
           rgba="1 0 0 1"
-      /> -->
+      />
 
       <site
           name="block1_grab"

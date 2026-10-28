@@ -6,8 +6,11 @@ actions (move, place, remove) toward a target structure.
 
 ## Conventions
 - Axes: z is up. Origin (0,0,0) is the corner of the ground plane.
+![Axes Reference](./images/coordinate_ref.png)
 - Grid cells indexed from 0. Block edge = ___ m.
-- Faces: +x, -x, +y, -y, +z, -z
+- Faces: px, nx, py, ny, pz, nz
+![Block Face Sites Reference](./images/faces_ref.png)
+
 
 ## Entities
 - Block: id, grid position, face connection

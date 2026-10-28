@@ -21,7 +21,7 @@
   </default>
 
   <worldbody>
-    <body name="ee1" pos="0 0 -0.052">
+    <body name="ee1" pos="0.25 0 -0.08">
       <!-- <freejoint name="root"/> -->
       <geom
         type="mesh"

@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="inchworm_scene">
+  <compiler angle="radian" autolimits="true" meshdir="../assets/meshes/visual" />
+  <option gravity="0 0 -9.81" timestep="0.002" />
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512" />
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1="0.9 0.9 0.9" rgb2="0.8 0.8 0.8" />
+    <material name="grid" texture="grid" texrepeat="8 8" />
+  </asset>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" />
+    <geom name="floor" type="plane" size="2 2 0.01" material="grid" contype="1" conaffinity="1" />
+    <body name="block0" pos="0.0371 0.0371 0.0371">
+      <freejoint name="block0_free" />
+      <geom name="block0_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block0_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block0_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block0_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block0_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block0_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block0_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+    <body name="block1" pos="0.11130000000000001 0.0371 0.0371">
+      <freejoint name="block1_free" />
+      <geom name="block1_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block1_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block1_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block1_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block1_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block1_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block1_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+    <body name="block2" pos="0.0371 0.0371 0.11130000000000001">
+      <freejoint name="block2_free" />
+      <geom name="block2_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block2_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block2_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block2_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block2_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block2_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block2_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+    <body name="block3" pos="0.0371 0.11130000000000001 0.0371">
+      <freejoint name="block3_free" />
+      <geom name="block3_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block3_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block3_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block3_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block3_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block3_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block3_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+    <body name="block4" pos="0.11130000000000001 0.11130000000000001 0.0371">
+      <freejoint name="block4_free" />
+      <geom name="block4_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block4_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block4_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block4_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block4_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block4_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block4_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+    <body name="block5" pos="0.1855 0.0371 0.0371">
+      <freejoint name="block5_free" />
+      <geom name="block5_geom" type="box" size="0.0371 0.0371 0.0371" mass="1" rgba="0.2 0.4 0.8 1" contype="1" conaffinity="1" />
+      <site name="block5_px" pos="0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block5_nx" pos="-0.0371 0 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block5_py" pos="0 0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block5_ny" pos="0 -0.0371 0" size="0.005" rgba="0 0 1 0" />
+      <site name="block5_pz" pos="0 0 0.0371" size="0.005" rgba="0 0 1 0" />
+      <site name="block5_nz" pos="0 0 -0.0371" size="0.005" rgba="0 0 1 0" />
+    </body>
+  </worldbody>
+  <include file="inchworm.xml" />
+  <equality>
+    <weld name="ee2_block0_px_weld" site1="ee2_grab" site2="block0_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block0_nx_weld" site1="ee2_grab" site2="block0_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block0_py_weld" site1="ee2_grab" site2="block0_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block0_ny_weld" site1="ee2_grab" site2="block0_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block0_pz_weld" site1="ee2_grab" site2="block0_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block0_nz_weld" site1="ee2_grab" site2="block0_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_px_weld" site1="ee2_grab" site2="block1_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_nx_weld" site1="ee2_grab" site2="block1_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_py_weld" site1="ee2_grab" site2="block1_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_ny_weld" site1="ee2_grab" site2="block1_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_pz_weld" site1="ee2_grab" site2="block1_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block1_nz_weld" site1="ee2_grab" site2="block1_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_px_weld" site1="ee2_grab" site2="block2_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_nx_weld" site1="ee2_grab" site2="block2_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_py_weld" site1="ee2_grab" site2="block2_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_ny_weld" site1="ee2_grab" site2="block2_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_pz_weld" site1="ee2_grab" site2="block2_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block2_nz_weld" site1="ee2_grab" site2="block2_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_px_weld" site1="ee2_grab" site2="block3_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_nx_weld" site1="ee2_grab" site2="block3_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_py_weld" site1="ee2_grab" site2="block3_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_ny_weld" site1="ee2_grab" site2="block3_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_pz_weld" site1="ee2_grab" site2="block3_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block3_nz_weld" site1="ee2_grab" site2="block3_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_px_weld" site1="ee2_grab" site2="block4_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_nx_weld" site1="ee2_grab" site2="block4_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_py_weld" site1="ee2_grab" site2="block4_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_ny_weld" site1="ee2_grab" site2="block4_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_pz_weld" site1="ee2_grab" site2="block4_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block4_nz_weld" site1="ee2_grab" site2="block4_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_px_weld" site1="ee2_grab" site2="block5_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_nx_weld" site1="ee2_grab" site2="block5_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_py_weld" site1="ee2_grab" site2="block5_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_ny_weld" site1="ee2_grab" site2="block5_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_pz_weld" site1="ee2_grab" site2="block5_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="ee2_block5_nz_weld" site1="ee2_grab" site2="block5_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block0_block1_weld" site1="block0_px" site2="block1_nx" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block0_block2_weld" site1="block0_pz" site2="block2_nz" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block0_block3_weld" site1="block0_py" site2="block3_ny" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block4_block1_weld" site1="block4_ny" site2="block1_py" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block4_block3_weld" site1="block4_nx" site2="block3_px" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+    <weld name="block5_block1_weld" site1="block5_nx" site2="block1_px" active="true" solref="0.1 1" solimp="0.7 0.9 0.001" />
+  </equality>
+</mujoco>

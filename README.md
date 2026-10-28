@@ -16,9 +16,9 @@ python scripts/test_grab.py
 # Test Walk
 python scripts/run_gait.py
 
-# View Multiple Cubes
-python scripts/multi_cube_test.py
-
+# Generate and Load Multiple Cube Scene
+python .\scripts\generate_multi_block_scene.py
+python scripts/load_scene.py
 
 
 Inchworm structure
