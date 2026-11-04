@@ -1,6 +1,9 @@
 """Generate reusable MuJoCo scenes containing any number of blocks."""
 
+import os
+import tempfile
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Iterable, Mapping, Tuple, Union
 import xml.etree.ElementTree as ET
 
@@ -14,6 +17,27 @@ _DIRECTIONS = {
     "+z": (0, 0, 1),
 }
 _OPPOSITE = {"+x": "-x", "+y": "-y", "+z": "-z"}
+_BLOCK_COLORS = (
+    (1.0, 0.2, 0.2, 1.0),
+    (0.2, 1.0, 0.2, 1.0),
+    (0.2, 0.4, 1.0, 1.0),
+    (1.0, 0.9, 0.1, 1.0),
+    (0.8, 0.2, 1.0, 1.0),
+    (0.1, 0.9, 0.9, 1.0),
+)
+
+
+@dataclass(frozen=True)
+class BlockSpec:
+    """Physical properties shared by every generated block."""
+
+    edge: float = BLOCK_EDGE
+    mass: float = 0.01
+    friction: Tuple[float, float, float] = (1.0, 0.005, 0.0001)
+    site_size: float = 0.001
+
+
+DEFAULT_BLOCK_SPEC = BlockSpec()
 
 
 def _format_vector(values: Iterable[float]) -> str:
@@ -25,7 +49,7 @@ def build_scene(
     scene_file: Union[Path, str],
     output_file: Union[Path, str],
     origin_offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
-    block_mass: float = 0.01,
+    block_spec: BlockSpec = DEFAULT_BLOCK_SPEC,
 ) -> None:
     """Create a scene with reusable block bodies and all required welds.
 
@@ -35,8 +59,10 @@ def build_scene(
     """
     if not block_positions:
         raise ValueError("block_positions must contain at least one block")
-    if block_mass <= 0:
-        raise ValueError("block_mass must be positive")
+    if block_spec.edge <= 0:
+        raise ValueError("block_spec.edge must be positive")
+    if block_spec.mass <= 0:
+        raise ValueError("block_spec.mass must be positive")
 
     tree = ET.parse(scene_file)
     root = tree.getroot()
@@ -54,7 +80,7 @@ def build_scene(
     else:
         equality.clear()
 
-    for block_id, coord in block_positions.items():
+    for block_index, (block_id, coord) in enumerate(block_positions.items()):
         if not block_id:
             raise ValueError("block IDs must not be empty")
         position = grid_to_world(coord, origin_offset)
@@ -70,12 +96,14 @@ def build_scene(
             "geom",
             name=f"{block_id}_geom",
             type="box",
-            size=_format_vector((BLOCK_EDGE / 2,) * 3),
-            mass=str(block_mass),
-            friction="1 0.005 0.0001",
+            size=_format_vector((block_spec.edge / 2,) * 3),
+            mass=str(block_spec.mass),
+            friction=_format_vector(block_spec.friction),
             contype="1",
             conaffinity="1",
-            rgba="0.2 0.4 0.8 1",
+            rgba=_format_vector(
+                _BLOCK_COLORS[block_index % len(_BLOCK_COLORS)]
+            ),
         )
         for face, site_suffix in FACE_TO_SITE.items():
             direction = {
@@ -87,9 +115,12 @@ def build_scene(
                 body,
                 "site",
                 name=f"{block_id}_{site_suffix}",
-                pos=_format_vector(component * BLOCK_EDGE / 2 for component in direction),
-                size="0.005",
-                rgba="0 0 1 0",
+                pos=_format_vector(
+                    component * block_spec.edge / 2 for component in direction
+                ),
+                size=str(block_spec.site_size),
+                rgba="0 0 0 0",
+                group="3",
             )
         for site_suffix in FACE_TO_SITE.values():
             ET.SubElement(
@@ -130,3 +161,31 @@ def build_scene(
 
     ET.indent(tree, space="  ")
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
+
+
+def create_temporary_scene(
+    block_positions: Mapping[str, GridCoord],
+    scene_file: Union[Path, str],
+    origin_offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+    block_spec: BlockSpec = DEFAULT_BLOCK_SPEC,
+) -> Path:
+    """Generate a temporary scene beside ``scene_file`` for MuJoCo loading."""
+    scene_path = Path(scene_file)
+    file_descriptor, temporary_name = tempfile.mkstemp(
+        prefix=".runtime-scene-",
+        suffix=".xml",
+        dir=scene_path.parent,
+    )
+    os.close(file_descriptor)
+    try:
+        build_scene(
+            block_positions,
+            scene_path,
+            temporary_name,
+            origin_offset=origin_offset,
+            block_spec=block_spec,
+        )
+    except Exception:
+        Path(temporary_name).unlink(missing_ok=True)
+        raise
+    return Path(temporary_name)

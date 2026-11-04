@@ -80,6 +80,12 @@ class WorldGrid:
         self.size_x = size_x
         self.size_y = size_y
         self.size_z = size_z
+        self.min_x = -(size_x // 2)
+        self.max_x = self.min_x + size_x - 1
+        self.min_y = -(size_y // 2)
+        self.max_y = self.min_y + size_y - 1
+        self.min_z = 0
+        self.max_z = size_z - 1
         self.block_edge = float(block_edge)
         self.origin_offset = np.asarray(origin_offset, dtype=float)
         # NumPy stores status values by x, y, then z.
@@ -194,11 +200,26 @@ class WorldGrid:
     def in_bounds(self, coord: GridCoord) -> bool:
         """Return whether a coordinate lies inside the configured grid."""
         x, y, z = self._coord(coord)
-        return 0 <= x < self.size_x and 0 <= y < self.size_y and 0 <= z < self.size_z
+        return (
+            self.min_x <= x <= self.max_x
+            and self.min_y <= y <= self.max_y
+            and self.min_z <= z <= self.max_z
+        )
+
+    def _array_index(self, coord: GridCoord) -> GridCoord:
+        """Map a signed logical coordinate to a safe NumPy array index."""
+        coord = self._coord(coord)
+        if not self.in_bounds(coord):
+            raise IndexError(f"coordinate {coord} is out of bounds")
+        return coord[0] - self.min_x, coord[1] - self.min_y, coord[2]
 
     def is_empty(self, coord: GridCoord) -> bool:
         """Return whether an in-bounds cell is empty."""
-        return self.in_bounds(coord) and self.grid[tuple(self._coord(coord))] == CellStatus.EMPTY
+        coord = self._coord(coord)
+        return (
+            self.in_bounds(coord)
+            and self.grid[self._array_index(coord)] == CellStatus.EMPTY
+        )
 
     def get_neighbors(self, coord: GridCoord) -> Dict[str, GridBlock]:
         """Return occupied neighboring cells keyed by their shared face."""
@@ -243,7 +264,7 @@ class WorldGrid:
 
         block = GridBlock(block_id, coord, status)
         # Keep the array and object indexes synchronized.
-        self.grid[coord] = status
+        self.grid[self._array_index(coord)] = status
         self.blocks[coord] = block
         self.blocks_by_id[block_id] = block
         # Link both sides of every face shared with an existing block.
@@ -264,7 +285,7 @@ class WorldGrid:
         block = self.blocks.pop(coord, None)
         if block is None:
             return None
-        self.grid[coord] = CellStatus.EMPTY
+        self.grid[self._array_index(coord)] = CellStatus.EMPTY
         self.blocks_by_id.pop(block.block_id, None)
         # Disconnect neighboring blocks before clearing the removed block.
         for face, neighbor in self.get_neighbors(coord).items():

@@ -2,7 +2,15 @@
 
 from typing import Any
 
-__all__ = ["MujocoBlock", "MujocoWorm", "SimBridge", "build_scene"]
+__all__ = [
+    "MujocoBlock",
+    "MujocoWorm",
+    "SimBridge",
+    "build_scene",
+    "create_temporary_scene",
+    "BlockSpec",
+    "DEFAULT_BLOCK_SPEC",
+]
 
 
 def __getattr__(name: str) -> Any:
@@ -23,4 +31,12 @@ def __getattr__(name: str) -> Any:
         from .scene_builder import build_scene
 
         return build_scene
+    if name == "create_temporary_scene":
+        from .scene_builder import create_temporary_scene
+
+        return create_temporary_scene
+    if name in {"BlockSpec", "DEFAULT_BLOCK_SPEC"}:
+        from .scene_builder import BlockSpec, DEFAULT_BLOCK_SPEC
+
+        return {"BlockSpec": BlockSpec, "DEFAULT_BLOCK_SPEC": DEFAULT_BLOCK_SPEC}[name]
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

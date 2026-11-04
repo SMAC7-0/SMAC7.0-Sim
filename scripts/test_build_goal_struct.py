@@ -9,39 +9,26 @@ import mujoco.viewer
 import numpy as np
 
 from inchworm_sim.core.world_grid import WorldGrid
+from inchworm_sim.scene_layout import ORIGIN_OFFSET, STARTING_BLOCKS
+from inchworm_sim.physics.coords import BLOCK_EDGE
+from inchworm_sim.physics.scene_builder import create_temporary_scene
 from inchworm_sim.physics.sim_bridge import SimBridge
 
 
-BLOCK_NAMES = tuple(f"block{index}" for index in range(1, 21))
-BLOCK_EDGE = 0.0742
 DEPOT_POSITION = np.array((0.0, 0.0, -10.0), dtype=float)
 
 
-def _scene_block_names(model: mujoco.MjModel) -> Tuple[str, ...]:
-    """Return configured block names that are present in the loaded scene."""
-    names = []
-    for name in BLOCK_NAMES:
-        try:
-            model.body(name)
-        except KeyError:
-            continue
-        names.append(name)
-    return tuple(names)
-
-
-model = mujoco.MjModel.from_xml_path("models/scene.xml")
+scene_path = create_temporary_scene(
+    STARTING_BLOCKS,
+    Path("models/scene.xml"),
+    origin_offset=ORIGIN_OFFSET,
+)
+model = mujoco.MjModel.from_xml_path(str(scene_path))
 data = mujoco.MjData(model)
-block_names = _scene_block_names(model)
-if not block_names:
-    raise RuntimeError("models/scene.xml does not contain any configured blocks")
-if len(block_names) < len(BLOCK_NAMES):
-    print(
-        f"Warning: scene contains {len(block_names)} of the "
-        f"{len(BLOCK_NAMES)} configured blocks"
-    )
+block_names = tuple(STARTING_BLOCKS)
 world_grid = WorldGrid(
     block_edge=BLOCK_EDGE,
-    origin_offset=(0.0, 0.0, 0.0),
+    origin_offset=ORIGIN_OFFSET,
 )
 world_grid.rules_enabled = True
 bridge = SimBridge(model, data, world_grid, block_names)
@@ -138,6 +125,7 @@ def _place_block(hit_geom_id: int, hit_point: np.ndarray) -> None:
 
     world_grid.place_block(unused_block_id, target_coord)
     bridge.blocks[unused_block_id].set_pose(world_grid.grid_to_world(target_coord))
+    bridge.attach_block_connections(unused_block_id)
     print(f"Placed {unused_block_id} at {target_coord}")
 
 
@@ -147,7 +135,11 @@ def _remove_block(hit_geom_id: int) -> None:
     if block_id is None:
         return
 
-    coord = world_grid.blocks_by_id[block_id].grid_pos
+    grid_block = world_grid.blocks_by_id.get(block_id)
+    if grid_block is None:
+        print(f"Removal ignored: {block_id} is already in the depot")
+        return
+    coord = grid_block.grid_pos
     if coord is None:
         return
     if not world_grid.is_valid_removal(coord):
@@ -155,6 +147,7 @@ def _remove_block(hit_geom_id: int) -> None:
         print(f"Removal rejected at {coord}: {reason}")
         return
 
+    bridge.detach_block_connections(block_id)
     world_grid.remove_block(coord)
     bridge.blocks[block_id].set_pose(DEPOT_POSITION)
     print(f"Removed {block_id} from {coord}")
@@ -180,23 +173,33 @@ def import_structure(filepath: str = "structure.xyz") -> None:
         print(f"Warning: structure file not found: {filepath}")
         return
 
-    coordinates = [
-        tuple(int(value) for value in line.split())
-        for line in structure_path.read_text(encoding="utf-8").splitlines()
-        if line.strip()
-    ]
+    coordinates = []
+    for line_number, line in enumerate(
+        structure_path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        if not line.strip():
+            continue
+        values = tuple(int(value) for value in line.split())
+        if len(values) != 3:
+            print(f"Warning: skipping line {line_number}: expected x y z")
+            continue
+        if values[2] < 0:
+            print(f"Warning: skipping line {line_number}: z must not be negative")
+            continue
+        coordinates.append(values)
 
     for block in list(world_grid.blocks_by_id.values()):
         if block.grid_pos is None:
             continue
         block_id = block.block_id
+        bridge.detach_block_connections(block_id)
         world_grid.remove_block(block.grid_pos, enforce_rules=False)
         bridge.blocks[block_id].set_pose(DEPOT_POSITION)
 
     count = 0
     for coord in coordinates:
-        if len(coord) != 3:
-            print(f"Warning: skipping invalid coordinate {coord}")
+        if not world_grid.in_bounds(coord):
+            print(f"Warning: skipping out-of-bounds coordinate {coord}")
             continue
         if not world_grid.is_empty(coord):
             print(f"Warning: skipping occupied coordinate {coord}")
@@ -212,6 +215,7 @@ def import_structure(filepath: str = "structure.xyz") -> None:
         bridge.blocks[unused_block_id].set_pose(
             world_grid.grid_to_world(coord)
         )
+        bridge.attach_block_connections(unused_block_id)
         count += 1
 
     print(f"Loaded {count} blocks from {filepath}")
@@ -305,15 +309,18 @@ print(
     "  Press V to toggle validity rules.\n"
 )
 
-with mujoco.viewer.launch_passive(
-    model,
-    data,
-    key_callback=key_callback,
-) as viewer:
-    viewer_handle = viewer
-    while viewer.is_running():
-        bridge.step()
-        viewer.sync()
-        # _update_target_highlight(viewer)
-        viewer.sync()
-        time.sleep(model.opt.timestep)
+try:
+    with mujoco.viewer.launch_passive(
+        model,
+        data,
+        key_callback=key_callback,
+    ) as viewer:
+        viewer_handle = viewer
+        while viewer.is_running():
+            bridge.step()
+            viewer.sync()
+            # _update_target_highlight(viewer)
+            viewer.sync()
+            time.sleep(model.opt.timestep)
+finally:
+    scene_path.unlink(missing_ok=True)

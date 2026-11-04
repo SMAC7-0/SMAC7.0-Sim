@@ -1,18 +1,26 @@
 import time
+from pathlib import Path
 
 import mujoco
 import mujoco.viewer
 
+from inchworm_sim.scene_layout import ORIGIN_OFFSET, STARTING_BLOCKS
 from inchworm_sim.core.world_grid import WorldGrid
 from inchworm_sim.physics.coords import BLOCK_EDGE
+from inchworm_sim.physics.scene_builder import create_temporary_scene
 from inchworm_sim.physics.sim_bridge import SimBridge
 
 
-model = mujoco.MjModel.from_xml_path("models/scene.xml")
+scene_path = create_temporary_scene(
+    STARTING_BLOCKS,
+    Path("models/scene.xml"),
+    origin_offset=ORIGIN_OFFSET,
+)
+model = mujoco.MjModel.from_xml_path(str(scene_path))
 data = mujoco.MjData(model)
 world_grid = WorldGrid(
     block_edge=BLOCK_EDGE,
-    origin_offset=(0.0, 0.0, 0.0),
+    origin_offset=ORIGIN_OFFSET,
 )
 bridge = SimBridge(model, data, world_grid)
 
@@ -53,8 +61,11 @@ def key_callback(keycode: int) -> None:
         bridge.worm.open_gripper("ee2", bridge)
 
 
-with mujoco.viewer.launch_passive(model, data, key_callback=key_callback) as viewer:
-    while viewer.is_running():
-        bridge.step()
-        viewer.sync()
-        time.sleep(model.opt.timestep)
+try:
+    with mujoco.viewer.launch_passive(model, data, key_callback=key_callback) as viewer:
+        while viewer.is_running():
+            bridge.step()
+            viewer.sync()
+            time.sleep(model.opt.timestep)
+finally:
+    scene_path.unlink(missing_ok=True)

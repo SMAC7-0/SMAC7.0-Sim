@@ -51,11 +51,42 @@ class SimBridge:
             for name in block_names
             for face in FACE_TO_SITE
         }
+        self.structural_weld_ids = {
+            model.equality(equality_id).name: equality_id
+            for equality_id in range(model.neq)
+            if re.fullmatch(
+                r"block\d+_block\d+_weld",
+                model.equality(equality_id).name,
+            )
+        }
         self.grab_distance = 0.03
         self.weld_ramp_time = 0.10
         self.release_cooldown_duration = 0.25
         self.release_cooldown = 0.0
         self.register_initial_blocks()
+
+    def detach_block_connections(self, block_id: str) -> None:
+        """Disable every physical structural weld involving a block."""
+        for weld_name, weld_id in self.structural_weld_ids.items():
+            block_names = weld_name.removesuffix("_weld").split("_")
+            if block_id in block_names:
+                self.data.eq_active[weld_id] = 0
+
+    def attach_block_connections(self, block_id: str) -> None:
+        """Enable structural welds to the block's currently placed neighbors."""
+        grid_block = self.world_grid.blocks_by_id.get(block_id)
+        if grid_block is None or grid_block.grid_pos is None:
+            return
+        for neighbor in self.world_grid.get_neighbors(grid_block.grid_pos).values():
+            candidates = (
+                f"{block_id}_{neighbor.block_id}_weld",
+                f"{neighbor.block_id}_{block_id}_weld",
+            )
+            for weld_name in candidates:
+                weld_id = self.structural_weld_ids.get(weld_name)
+                if weld_id is not None:
+                    self.data.eq_active[weld_id] = 1
+                    break
 
     def register_initial_blocks(self) -> None:
         """Register every scene block in the logical grid."""
@@ -114,8 +145,8 @@ class SimBridge:
         self, target_coord: GridCoord, require_support: bool
     ) -> Optional[GridCoord]:
         candidates = []
-        for x in range(self.world_grid.size_x):
-            for y in range(self.world_grid.size_y):
+        for x in range(self.world_grid.min_x, self.world_grid.max_x + 1):
+            for y in range(self.world_grid.min_y, self.world_grid.max_y + 1):
                 for z in range(self.world_grid.size_z):
                     coord = (x, y, z)
                     if self.world_grid.is_empty(coord) and (
@@ -185,13 +216,18 @@ class SimBridge:
             self.blocks[block_id].get_world_pos()
         )
         target_coord = tuple(
-            max(0, min(limit - 1, value))
-            for value, limit in zip(
+            max(lower, min(upper, value))
+            for value, lower, upper in zip(
                 target_coord,
                 (
-                    self.world_grid.size_x,
-                    self.world_grid.size_y,
-                    self.world_grid.size_z,
+                    self.world_grid.min_x,
+                    self.world_grid.min_y,
+                    self.world_grid.min_z,
+                ),
+                (
+                    self.world_grid.max_x,
+                    self.world_grid.max_y,
+                    self.world_grid.max_z,
                 ),
             )
         )

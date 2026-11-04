@@ -7,6 +7,8 @@ actions (move, place, remove) toward a target structure.
 ## Conventions
 - Axes: z is up. Origin (0,0,0) is the corner of the ground plane.
 - Grid cells indexed from 0. Block edge = 0.0742 m (just under 3 inches).
+- Horizontal grid coordinates may be negative within the configured bounds;
+  height coordinates must have `z >= 0`.
 - Logical faces use `+x`, `-x`, `+y`, `-y`, `+z`, and `-z`.
   MuJoCo site suffixes use `px`, `nx`, `py`, `ny`, `pz`, and `nz`.
 - Faces: +x, -x, +y, -y, +z, -z
@@ -29,6 +31,11 @@ Step(direction), placeBlock(face), removeBlock(face)
 - core/ (Person A), physics/ (Person B). Core never imports mujoco.
 - `inchworm_sim.physics.scene_builder` generates scenes with any number of
   reusable block bodies from logical grid coordinates.
+- `inchworm_sim.scene_layout` owns the starting block IDs and grid coordinates.
+  Demo scenes generate MuJoCo block bodies, face sites, and welds at runtime;
+  those instance details are not maintained in the base scene XML.
+- `models/block.xml` is a one-block reference for dimensions, mass, and face
+  sites. It is not the source of the demo block count or starting positions.
 
 ## Open questions
 - ...
