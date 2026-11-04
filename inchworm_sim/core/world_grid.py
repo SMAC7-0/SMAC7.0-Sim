@@ -66,7 +66,7 @@ class WorldGrid:
         size_x: int = 50,
         size_y: int = 50,
         size_z: int = 4,
-        block_edge: float = 0.0762,
+        block_edge: float = 0.0742,
         origin_offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
         validity_config: Optional[ValidityConfig] = None,
     ) -> None:
