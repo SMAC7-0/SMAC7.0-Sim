@@ -11,7 +11,7 @@ model = mujoco.MjModel.from_xml_path("models/scene.xml")
 data = mujoco.MjData(model)
 world_grid = WorldGrid(
     block_edge=0.0762,
-    origin_offset=(-0.1381, -0.0181, 0.0),
+    origin_offset=(-0.2143, -0.0943, 0.0),
 )
 bridge = SimBridge(model, data, world_grid)
 
@@ -20,11 +20,23 @@ print(
     "  Move joints with the MuJoCo viewer Control sliders or keyboard shortcuts.\n"
     "  Move ee2 within 30 mm of a block and press SPACE to grab it.\n"
     "  Move the held block, then press SPACE again to release and snap it to the 3D grid.\n"
+    "  With validity enabled, block1 at (1, 1, 0) is trapped by blocks2..5 and "
+    "cannot be picked up.\n"
+    "  Pick up an outer block, stack it at z=1, and block1 becomes removable "
+    "after one horizontal neighbor is gone.\n"
+    "  Press V to toggle validity checks; SPACE grabs/releases.\n"
 )
 
 
 def key_callback(keycode: int) -> None:
     """Toggle the ee2 gripper when the viewer's spacebar is pressed."""
+    if keycode == ord("v") or keycode == ord("V"):
+        bridge.world_grid.set_validity_enabled(
+            not bridge.world_grid.rules_enabled
+        )
+        state = "ENABLED" if bridge.world_grid.rules_enabled else "DISABLED"
+        print(f"Validity checks: {state}")
+        return
     if keycode != ord(" "):
         return
     print("SPACE pressed")

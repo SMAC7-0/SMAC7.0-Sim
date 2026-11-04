@@ -1,9 +1,19 @@
 """MuJoCo-backed block adapter."""
 
-from typing import Tuple
+from typing import Dict, Tuple
 
 import mujoco
 import numpy as np
+
+
+FACE_TO_SITE = {
+    "+x": "px",
+    "-x": "nx",
+    "+y": "py",
+    "-y": "ny",
+    "+z": "pz",
+    "-z": "nz",
+}
 
 
 class MujocoBlock:
@@ -16,7 +26,10 @@ class MujocoBlock:
         self.data = data
         self.block_id = block_id
         self.body_id = model.body(block_id).id
-        self.site_id = model.site(f"{block_id}_grab").id
+        self.face_site_ids: Dict[str, int] = {
+            face: model.site(f"{block_id}_{site_suffix}").id
+            for face, site_suffix in FACE_TO_SITE.items()
+        }
         joint_id = model.body_jntadr[self.body_id]
         self.qpos_adr = model.jnt_qposadr[joint_id]
         self.qvel_adr = model.jnt_dofadr[joint_id]
@@ -25,9 +38,17 @@ class MujocoBlock:
         """Return a copy of the block body's world-space position."""
         return self.data.xpos[self.body_id].copy()
 
+    def get_face_site_pos(self, face: str) -> np.ndarray:
+        """Return a copy of a named face site's world position."""
+        try:
+            site_id = self.face_site_ids[face]
+        except KeyError as exc:
+            raise ValueError(f"invalid block face {face!r}") from exc
+        return self.data.site_xpos[site_id].copy()
+
     def get_grab_site_pos(self) -> np.ndarray:
-        """Return a copy of the block's grab-site world position."""
-        return self.data.site_xpos[self.site_id].copy()
+        """Return the top face position for backward compatibility."""
+        return self.get_face_site_pos("+z")
 
     def set_pose(
         self,

@@ -28,7 +28,7 @@ class MujocoWorm:
             self.gripper_sites["ee1"] = model.site("ee1_grab").id
         self.joint_ids = [model.joint(name).id for name in self.JOINT_NAMES]
         self.actuator_ids = [model.actuator(name).id for name in self.ACTUATOR_NAMES]
-        self.held_blocks: Dict[str, Optional[str]] = {"ee2": None}
+        self.held_blocks: Dict[str, Optional[Tuple[str, str]]] = {"ee2": None}
         self.connections: Dict[str, object] = {}
         self.weld_timers: Dict[str, float] = {"ee2": 0.0}
         self.soft_solref = (0.10, 1.0)

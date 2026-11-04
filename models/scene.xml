@@ -23,23 +23,37 @@
   <include file="inchworm.xml"/>
   <include file="block.xml"/>
 
-  <!-- Block welds are enabled by the interactive grab script. -->
   <equality>
-    <weld
-        name="ee2_block1_weld"
-        site1="ee2_grab"
-        site2="block1_grab"
-        active="false"
-        solref="0.1 1"
-        solimp="0.7 0.9 0.001"
-    />
-    <weld
-        name="ee2_block2_weld"
-        site1="ee2_grab"
-        site2="block2_grab"
-        active="false"
-        solref="0.1 1"
-        solimp="0.7 0.9 0.001"
-    />
+    <!-- Block welds are enabled by the interactive grab script. -->
+    <weld name="ee2_block1_px_weld" site1="ee2_grab" site2="block1_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block1_nx_weld" site1="ee2_grab" site2="block1_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block1_py_weld" site1="ee2_grab" site2="block1_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block1_ny_weld" site1="ee2_grab" site2="block1_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block1_pz_weld" site1="ee2_grab" site2="block1_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block1_nz_weld" site1="ee2_grab" site2="block1_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_px_weld" site1="ee2_grab" site2="block2_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_nx_weld" site1="ee2_grab" site2="block2_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_py_weld" site1="ee2_grab" site2="block2_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_ny_weld" site1="ee2_grab" site2="block2_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_pz_weld" site1="ee2_grab" site2="block2_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block2_nz_weld" site1="ee2_grab" site2="block2_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_px_weld" site1="ee2_grab" site2="block3_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_nx_weld" site1="ee2_grab" site2="block3_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_py_weld" site1="ee2_grab" site2="block3_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_ny_weld" site1="ee2_grab" site2="block3_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_pz_weld" site1="ee2_grab" site2="block3_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block3_nz_weld" site1="ee2_grab" site2="block3_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_px_weld" site1="ee2_grab" site2="block4_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_nx_weld" site1="ee2_grab" site2="block4_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_py_weld" site1="ee2_grab" site2="block4_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_ny_weld" site1="ee2_grab" site2="block4_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_pz_weld" site1="ee2_grab" site2="block4_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block4_nz_weld" site1="ee2_grab" site2="block4_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_px_weld" site1="ee2_grab" site2="block5_px" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_nx_weld" site1="ee2_grab" site2="block5_nx" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_py_weld" site1="ee2_grab" site2="block5_py" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_ny_weld" site1="ee2_grab" site2="block5_ny" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_pz_weld" site1="ee2_grab" site2="block5_pz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
+    <weld name="ee2_block5_nz_weld" site1="ee2_grab" site2="block5_nz" active="false" solref="0.1 1" solimp="0.7 0.9 0.001"/>
   </equality>
 </mujoco>

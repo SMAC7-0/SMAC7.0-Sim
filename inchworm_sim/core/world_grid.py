@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import Dict, Optional, Tuple, Union
+from typing import Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
 
@@ -27,6 +27,15 @@ OPPOSITE_FACE = {
     "+z": "-z",
     "-z": "+z",
 }
+
+
+@dataclass
+class ValidityConfig:
+    """Runtime switches for the logical placement and removal rules."""
+
+    rules_enabled: bool = True
+    check_vertical_support: bool = True
+    check_not_surrounded: bool = True
 
 
 class CellStatus(IntEnum):
@@ -59,6 +68,7 @@ class WorldGrid:
         size_z: int = 4,
         block_edge: float = 0.0762,
         origin_offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        validity_config: Optional[ValidityConfig] = None,
     ) -> None:
         if block_edge <= 0:
             raise ValueError("block_edge must be positive")
@@ -79,6 +89,73 @@ class WorldGrid:
         # Keep both coordinate and ID lookups for fast logical updates.
         self.blocks: Dict[GridCoord, GridBlock] = {}
         self.blocks_by_id: Dict[str, GridBlock] = {}
+        self.validity = validity_config or ValidityConfig()
+        self.placement_rules: Dict[str, Callable[[GridCoord], Optional[str]]] = {
+            "vertical_support": self._placement_support_reason,
+        }
+        self.removal_rules: Dict[str, Callable[[GridCoord], Optional[str]]] = {
+            "not_surrounded": self._removal_surrounded_reason,
+        }
+
+    @property
+    def rules_enabled(self) -> bool:
+        return self.validity.rules_enabled
+
+    @rules_enabled.setter
+    def rules_enabled(self, enabled: bool) -> None:
+        self.validity.rules_enabled = bool(enabled)
+
+    def set_validity_enabled(self, enabled: bool) -> None:
+        """Enable or disable enforcement of all registered validity rules."""
+        self.rules_enabled = enabled
+
+    def _placement_support_reason(self, coord: GridCoord) -> Optional[str]:
+        if self.validity.check_vertical_support and coord[2] > 0:
+            if "-z" not in self.get_neighbors(coord):
+                return f"no supporting block directly below {coord}"
+        return None
+
+    def _removal_surrounded_reason(self, coord: GridCoord) -> Optional[str]:
+        horizontal_faces = ("+x", "-x", "+y", "-y")
+        if self.validity.check_not_surrounded and all(
+            face in self.get_neighbors(coord) for face in horizontal_faces
+        ):
+            return (
+                f"block at {coord} is surrounded on all 4 horizontal sides"
+            )
+        return None
+
+    def placement_validation_error(self, coord: GridCoord) -> Optional[str]:
+        """Return the first placement rule failure, or ``None`` if valid."""
+        coord = self._coord(coord)
+        if not self.in_bounds(coord):
+            return f"coordinate {coord} is out of bounds"
+        if not self.is_empty(coord):
+            return f"coordinate {coord} is occupied"
+        if not self.rules_enabled:
+            return None
+        for rule_name, rule in self.placement_rules.items():
+            if rule_name == "vertical_support" and not self.validity.check_vertical_support:
+                continue
+            reason = rule(coord)
+            if reason:
+                return reason
+        return None
+
+    def removal_validation_error(self, coord: GridCoord) -> Optional[str]:
+        """Return the first removal rule failure, or ``None`` if valid."""
+        coord = self._coord(coord)
+        if coord not in self.blocks:
+            return f"no block exists at {coord}"
+        if not self.rules_enabled:
+            return None
+        for rule_name, rule in self.removal_rules.items():
+            if rule_name == "not_surrounded" and not self.validity.check_not_surrounded:
+                continue
+            reason = rule(coord)
+            if reason:
+                return reason
+        return None
 
     @staticmethod
     def _coord(coord: GridCoord) -> GridCoord:
@@ -136,11 +213,11 @@ class WorldGrid:
 
     def is_valid_placement(self, coord: GridCoord) -> bool:
         """Return whether a block can be supported at a coordinate."""
-        coord = self._coord(coord)
-        if not self.is_empty(coord):
-            return False
-        # Ground cells are supported by z=0; higher cells need a neighbor.
-        return coord[2] == 0 or bool(self.get_neighbors(coord))
+        return self.placement_validation_error(coord) is None
+
+    def is_valid_removal(self, coord: GridCoord) -> bool:
+        """Return whether the block at a coordinate can be picked up."""
+        return self.removal_validation_error(coord) is None
 
     def place_block(
         self,
@@ -157,8 +234,10 @@ class WorldGrid:
             raise ValueError(f"block_id {block_id!r} is already placed")
         if not isinstance(status, CellStatus):
             status = CellStatus(status)
-        if enforce_rules and not self.is_valid_placement(coord):
-            raise ValueError(f"invalid block placement at {coord}")
+        if enforce_rules and self.rules_enabled:
+            reason = self.placement_validation_error(coord)
+            if reason:
+                raise ValueError(f"invalid block placement: {reason}")
         if not self.in_bounds(coord):
             raise ValueError(f"coordinate {coord} is out of bounds")
 
@@ -173,9 +252,15 @@ class WorldGrid:
             neighbor.face_connections[OPPOSITE_FACE[face]] = block_id
         return block
 
-    def remove_block(self, coord: GridCoord) -> Optional[GridBlock]:
+    def remove_block(
+        self, coord: GridCoord, enforce_rules: bool = True
+    ) -> Optional[GridBlock]:
         """Remove a block, clear its cell, and disconnect its neighbors."""
         coord = self._coord(coord)
+        if enforce_rules and self.rules_enabled:
+            reason = self.removal_validation_error(coord)
+            if reason:
+                raise ValueError(f"invalid block removal: {reason}")
         block = self.blocks.pop(coord, None)
         if block is None:
             return None
