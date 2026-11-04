@@ -5,15 +5,7 @@ from typing import Dict, Tuple
 import mujoco
 import numpy as np
 
-
-FACE_TO_SITE = {
-    "+x": "px",
-    "-x": "nx",
-    "+y": "py",
-    "-y": "ny",
-    "+z": "pz",
-    "-z": "nz",
-}
+from .coords import FACE_TO_SITE
 
 
 class MujocoBlock:

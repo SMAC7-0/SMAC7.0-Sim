@@ -4,3 +4,7 @@
 # Python bytecode and caches
 *.pyc
 __pycache__/
+
+# Interactive/generated simulator state
+structure.xyz
+models/generated_scene.xml

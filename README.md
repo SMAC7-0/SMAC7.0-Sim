@@ -17,7 +17,10 @@ python scripts/test_grab.py
 python scripts/run_gait.py
 
 # View Multiple Cubes
-python scripts/multi_cube_test.py
+python scripts/multi_block_test.py
+
+# Generate a scene with any number of reusable 3-inch blocks
+python scripts/generate_multi_block_scene.py
 
 
 

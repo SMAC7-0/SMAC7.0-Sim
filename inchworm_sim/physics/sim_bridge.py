@@ -1,5 +1,6 @@
 """Scene-level bridge between MuJoCo objects and the logical world grid."""
 
+import re
 from typing import Dict, Optional, Tuple
 
 import mujoco
@@ -21,14 +22,25 @@ class SimBridge:
         model: mujoco.MjModel,
         data: mujoco.MjData,
         world_grid: WorldGrid,
-        block_names: Tuple[str, ...] = (
-            "block1", "block2", "block3", "block4", "block5"
-        ),
+        block_names: Optional[Tuple[str, ...]] = None,
     ) -> None:
         self.model = model
         self.data = data
         self.world_grid = world_grid
         self.worm = MujocoWorm(model, data)
+        if block_names is None:
+            block_names = tuple(
+                sorted(
+                    (
+                        model.body(body_id).name
+                        for body_id in range(model.nbody)
+                        if re.fullmatch(r"block\d+", model.body(body_id).name)
+                    ),
+                    key=lambda name: int(name[5:]),
+                )
+            )
+        if not block_names:
+            raise ValueError("the MuJoCo model contains no blockN bodies")
         self.blocks = {
             name: MujocoBlock(model, data, name) for name in block_names
         }
