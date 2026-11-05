@@ -31,28 +31,28 @@ with mujoco.viewer.launch_passive(model, data) as v:
     # block_site_id = model.site("block5_pz").id
 
 
-    with v.lock():
-        v.user_scn.ngeom = 2
+    # with v.lock():
+    #     v.user_scn.ngeom = 2
 
-        """Block face marker: green"""
-        mujoco.mjv_initGeom(
-            v.user_scn.geoms[1],
-            mujoco.mjtGeom.mjGEOM_SPHERE,
-            np.array([0.008, 0, 0]),
-            # data.site_xpos[block_site_id].copy(),
-            np.eye(3).flatten(),
-            np.array([0, 1, 0, 1]),
-        )
+        # """Block face marker: green"""
+        # mujoco.mjv_initGeom(
+        #     v.user_scn.geoms[1],
+        #     mujoco.mjtGeom.mjGEOM_SPHERE,
+        #     np.array([0.008, 0, 0]),
+        #     data.site_xpos[block_site_id].copy(),
+        #     np.eye(3).flatten(),
+        #     np.array([0, 1, 0, 1]),
+        # )
 
-        """EE site marker: red"""
-        mujoco.mjv_initGeom(
-            v.user_scn.geoms[0],
-            mujoco.mjtGeom.mjGEOM_SPHERE,
-            np.array([0.012, 0, 0]),
-            # data.site_xpos[ee_site_id].copy(),
-            np.eye(3).flatten(),
-            np.array([1, 0, 0, 1]),
-        )
+        # """EE site marker: red"""
+        # mujoco.mjv_initGeom(
+        #     v.user_scn.geoms[0],
+        #     mujoco.mjtGeom.mjGEOM_SPHERE,
+        #     np.array([0.012, 0, 0]),
+        #     data.site_xpos[ee_site_id].copy(),
+        #     np.eye(3).flatten(),
+        #     np.array([1, 0, 0, 1]),
+        # )
 
     """Demo: grab block 5 and swing it sideways"""
     arm = Arm(model, data, v)
