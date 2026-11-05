@@ -1,2 +1,4 @@
 # Python packaging artifacts
 *.egg-info/
+*.pyc
+*__pycache__/
