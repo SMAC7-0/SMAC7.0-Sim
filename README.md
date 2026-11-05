@@ -22,6 +22,9 @@ python scripts/multi_block_test.py
 # Generate a committed example scene with any number of reusable blocks
 python scripts/generate_multi_block_scene.py
 
+# Move, grab, and place a block through SimBridge
+python scripts/demo_grab_multi.py
+
 The interactive demos generate their block bodies, face sites, and welds at
 startup from the shared layout in `inchworm_sim/scene_layout.py`. The generated
 runtime XML is temporary; edit that Python layout instead of hand-editing block

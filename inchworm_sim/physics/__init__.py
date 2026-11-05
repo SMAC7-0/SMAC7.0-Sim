@@ -5,6 +5,7 @@ from typing import Any
 __all__ = [
     "MujocoBlock",
     "MujocoWorm",
+    "Arm",
     "SimBridge",
     "build_scene",
     "create_temporary_scene",
@@ -23,6 +24,10 @@ def __getattr__(name: str) -> Any:
         from .mujoco_worm import MujocoWorm
 
         return MujocoWorm
+    if name == "Arm":
+        from .inchworm_ctrl import Arm
+
+        return Arm
     if name == "SimBridge":
         from .sim_bridge import SimBridge
 
