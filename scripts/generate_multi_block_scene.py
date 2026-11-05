@@ -19,6 +19,7 @@ block_positions = {
 }
 
 # Connections between blocks
+# Format: (block_id_1, block_id_2, block_1_face, block_2_face)
 block_connections = [
     (0, 1, "px", "nx"),
     (0, 2, "pz", "nz"),

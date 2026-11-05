@@ -28,6 +28,23 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
     if worldbody is None:
         raise ValueError("scene.xml has no worldbody element")
 
+    # --------------------------------------------------
+    # Set camera
+    # --------------------------------------------------
+
+    camera = worldbody.find("./camera[@name='main_camera']")
+
+    if camera is None:
+        camera = ET.SubElement(
+            worldbody,
+            "camera",
+            name="main_camera",
+        )
+
+    camera.set("pos", "-0.324 -1.425 0.414")
+    camera.set("xyaxes", "0.917 -0.399 -0.000 0.090 0.206 0.974")
+
+
     # Ensure equality section exists
     equality = root.find("equality")
 
@@ -84,19 +101,39 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
     # All start inactive.
     # --------------------------------------------------
 
-    for id in block_positions_i:
-        for face in B_FACES:
+    # for id in block_positions_i:
+    #     for face in B_FACES:
 
-            ET.SubElement(
-                equality,
-                "weld",
-                name=f"ee2_block{id}_{face}_weld",
-                site1="ee2_grab",
-                site2=f"block{id}_{face}",
-                active="false",
-                solref="0.1 1",
-                solimp="0.7 0.9 0.001",
-            )
+    #         ET.SubElement(
+    #             equality,"weld",
+    #             name=f"ee2_block{id}_{face}_weld",
+    #             site1="ee2_grab",
+    #             site2=f"block{id}_{face}",
+    #             active="false",
+    #             solref="0.1 1",
+    #             solimp="0.7 0.9 0.001",
+    #         )
+
+    for id in block_positions_i:
+        ET.SubElement(
+            equality,
+            "weld",
+            name=f"ee2_block{id}_weld",
+            body1="ee2",
+            body2=f"block{id}",
+            active="false",
+            solref="0.002 1",
+            solimp="0.999 0.9999 0.001",
+        )
+
+    # for id in block_positions_i:
+    #     ET.SubElement(
+    #         equality, "weld",
+    #         name=f"ee2_block{id}_weld",
+    #         body1="ee2", body2=f"block{id}",
+    #         active="false",
+    #         solref="0.02 1", solimp="0.9 0.95 0.001",
+    #     )
 
 
     # --------------------------------------------------
