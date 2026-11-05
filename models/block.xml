@@ -1,3 +1,4 @@
+<!--Block model XML file for MuJoCo simulation.-->
 <mujoco>
   <asset>
     <mesh name="block_mesh" file="full-block-simple.stl" scale="0.001 0.001 0.001"/>

@@ -7,8 +7,10 @@ from inchworm_sim.physics.scene_builder import build_scene
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Block positions: (x, y, z)
-# Will be replaced by world's blocks() in Core
+"""
+Block positions: (x, y, z)
+Will be replaced by world's blocks() in Core
+"""
 block_positions = {
     0: (0, 0, 0),
     1: (1, 0, 0),
@@ -18,8 +20,10 @@ block_positions = {
     5: (2, 0, 0),
 }
 
-# Connections between blocks
-# Format: (block_id_1, block_id_2, block_1_face, block_2_face)
+"""
+Connections between blocks
+Format: (block_id_1, block_id_2, block_1_face, block_2_face)
+"""
 block_connections = [
     (0, 1, "px", "nx"),
     (0, 2, "pz", "nz"),

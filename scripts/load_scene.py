@@ -1,16 +1,18 @@
-
+"""
+This script loads the generated scene XML file and opens an interactive viewer to visualize the scene.
+"""
 from pathlib import Path
 import mujoco
 import mujoco.viewer
 
-# Load the model
+"""Load the model"""
 model = mujoco.MjModel.from_xml_path("models/generated_scene.xml")
 data = mujoco.MjData(model)
 
-# Initialize the simulation
+"""Initialize the simulation"""
 mujoco.mj_forward(model, data)
 
-# Open the interactive viewer
+"""Open the interactive viewer"""
 with mujoco.viewer.launch_passive(model, data) as viewer:
     while viewer.is_running():
         mujoco.mj_step(model, data)

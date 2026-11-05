@@ -1,3 +1,4 @@
+<!--Scene used for test_grab.py-->
 <mujoco model="inchworm_scene">
   <compiler angle="radian" autolimits="true" meshdir="../assets/meshes/visual"/>
   <option gravity="0 0 -9.81" timestep="0.002"/> 

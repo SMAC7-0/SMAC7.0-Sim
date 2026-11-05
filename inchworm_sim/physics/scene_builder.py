@@ -1,3 +1,6 @@
+"""
+Builds a MuJoCo scene XML file from a given set of blocks and connections.
+"""
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -16,9 +19,7 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
         "nz": (0, 0, -HALF),
     }
 
-    # --------------------------------------------------
-    # Load the base scene
-    # --------------------------------------------------
+    """Load the base scene"""
 
     tree = ET.parse(scene_file)
     root = tree.getroot()
@@ -28,10 +29,7 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
     if worldbody is None:
         raise ValueError("scene.xml has no worldbody element")
 
-    # --------------------------------------------------
-    # Set camera
-    # --------------------------------------------------
-
+    """Set camera"""
     camera = worldbody.find("./camera[@name='main_camera']")
 
     if camera is None:
@@ -45,17 +43,14 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
     camera.set("xyaxes", "0.917 -0.399 -0.000 0.090 0.206 0.974")
 
 
-    # Ensure equality section exists
+    """Ensure equality section exists"""
     equality = root.find("equality")
 
     if equality is None:
         equality = ET.SubElement(root, "equality")
 
 
-    # --------------------------------------------------
-    # Generate blocks
-    # --------------------------------------------------
-
+    """Generate blocks"""
     for id, (x, y, z) in block_positions_i.items():
 
         pos = coords.grid_to_world(x, y, z)
@@ -96,11 +91,10 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
             )
 
 
-    # --------------------------------------------------
-    # Inchworm-to-block welds
-    # All start inactive.
-    # --------------------------------------------------
-
+    """Inchworm-to-block welds
+    All start inactive."""
+    
+    # Previously used site-based welds, but switched to body-based welds for better stability and simplicity.
     # for id in block_positions_i:
     #     for face in B_FACES:
 
@@ -126,23 +120,11 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
             solimp="0.999 0.9999 0.001",
         )
 
-    # for id in block_positions_i:
-    #     ET.SubElement(
-    #         equality, "weld",
-    #         name=f"ee2_block{id}_weld",
-    #         body1="ee2", body2=f"block{id}",
-    #         active="false",
-    #         solref="0.02 1", solimp="0.9 0.95 0.001",
-    #     )
 
-
-    # --------------------------------------------------
-    # Block-to-block welds
-    # These start active.
-    # --------------------------------------------------
+    """Block-to-block welds
+    These start active."""
 
     for a, b, face_a, face_b in block_connections_i:
-
         if a not in block_positions_i or b not in block_positions_i:
             raise ValueError(
                 f"Invalid connection: block {a} or {b} does not exist"
@@ -160,9 +142,7 @@ def build_scene(block_positions_i, block_connections_i, scene_file, out_path):
         )
 
 
-    # --------------------------------------------------
-    # Write generated XML
-    # --------------------------------------------------
+    """Write generated XML"""
 
     ET.indent(tree, space="  ")
 

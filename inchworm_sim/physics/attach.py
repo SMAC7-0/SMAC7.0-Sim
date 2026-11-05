@@ -1,11 +1,17 @@
-
+"""
+Provides utility functions for managing block attachments in a MuJoCo
+simulation. Supports detecting the nearest block face, dynamically
+grabbing and releasing blocks using weld constraints, and managing
+existing block-to-block connections.
+Covers both block-to-block and end-effector-to-block welds, allowing for flexible
+manipulation of blocks in the simulation environment.
+"""
 import re
 import numpy as np
 import mujoco
 
 FACES = ("px", "nx", "py", "ny", "pz", "nz")
 BB = re.compile(r"^block(\d+)_block(\d+)_weld$")
-
 
 def set_weld(model, data, name, active: bool):
     data.eq_active[model.equality(name).id] = int(active) 
@@ -22,6 +28,7 @@ def block_welds(model, block_id, only_active=False, data=None):
             out.append(name)
     return out
 
+"""Finds the nearest block face to the end-effector site within a specified distance threshold."""
 def nearest_face(model, data, ee_site, block_ids, max_dist=0.02):
     ee = data.site_xpos[model.site(ee_site).id]
     best, best_d = None, max_dist
@@ -49,6 +56,9 @@ def nearest_face(model, data, ee_site, block_ids, max_dist=0.02):
 # def release(model, data, bid, face):
 #     set_weld(model, data, f"ee2_block{bid}_{face}_weld", False)
 
+"""Inchworm functions"""
+
+"""Grab block - employs body-based welds and nearest face detection to identify the closest block face to the end-effector."""
 def grab(model, data, block_ids, ee_site="ee2_grab"):
     hit = nearest_face(model, data, ee_site, block_ids)
 
@@ -101,3 +111,5 @@ def grab(model, data, block_ids, ee_site="ee2_grab"):
 
 def release(model, data, bid, face=None):
     set_weld(model, data, f"ee2_block{bid}_weld", False)
+
+"""Block-to-block welds - manages the connection between two blocks, allowing for dynamic attachment and detachment."""
