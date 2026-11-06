@@ -21,7 +21,7 @@ def __getattr__(name: str) -> Any:
 
         return MujocoBlock
     if name == "MujocoWorm":
-        from .mujoco_worm import MujocoWorm
+        from .mujoco_inchworm import MujocoWorm
 
         return MujocoWorm
     if name == "Arm":

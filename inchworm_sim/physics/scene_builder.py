@@ -9,7 +9,6 @@ import xml.etree.ElementTree as ET
 
 from .coords import BLOCK_EDGE, FACE_TO_SITE, grid_to_world
 
-
 GridCoord = Tuple[int, int, int]
 _DIRECTIONS = {
     "+x": (1, 0, 0),
@@ -101,15 +100,16 @@ def build_scene(
             friction=_format_vector(block_spec.friction),
             contype="1",
             conaffinity="1",
-            rgba=_format_vector(
-                _BLOCK_COLORS[block_index % len(_BLOCK_COLORS)]
-            ),
+            rgba=_format_vector(_BLOCK_COLORS[block_index % len(_BLOCK_COLORS)]),
         )
         for face, site_suffix in FACE_TO_SITE.items():
             direction = {
-                "+x": (1, 0, 0), "-x": (-1, 0, 0),
-                "+y": (0, 1, 0), "-y": (0, -1, 0),
-                "+z": (0, 0, 1), "-z": (0, 0, -1),
+                "+x": (1, 0, 0),
+                "-x": (-1, 0, 0),
+                "+y": (0, 1, 0),
+                "-y": (0, -1, 0),
+                "+z": (0, 0, 1),
+                "-z": (0, 0, -1),
             }[face]
             ET.SubElement(
                 body,
@@ -130,8 +130,8 @@ def build_scene(
                 site1="ee2_grab",
                 site2=f"{block_id}_{site_suffix}",
                 active="false",
-                solref="0.1 1",
-                solimp="0.7 0.9 0.001",
+                solref="0.002 1",
+                solimp="0.999 0.9999 0.001",
             )
 
     positions = {}
