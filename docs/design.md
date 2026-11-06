@@ -37,8 +37,22 @@ Step(direction), placeBlock(face), removeBlock(face)
 - `models/block.xml` is a one-block reference for dimensions, mass, and face
   sites. It is not the source of the demo block count or starting positions.
 
+## Attachment
+- One site per block face (`blockN_px`, ...), in the block frame. Block-to-block
+  and gripper welds share these sites.
+- The gripper carries six rotated sites, `ee2_grab_px` ... `ee2_grab_nz`, at
+  the `ee2_grab` point. Weld `ee2_blockN_{site}_weld` joins `ee2_grab_{site}`
+  to `blockN_{site}`, so the grabbed face sits flush and the cube's sides stay
+  parallel to the gripper.
+- Held blocks are re-aligned to the gripper after every physics step; placed
+  blocks are snapped to their grid cells.
+
 ## Open questions
 - ...
 
 ## Decisions log
 - 2026-10-22: Initial design in progress
+- 2026-11-05: Grabs keep six face-specific site welds (not physics-B2's
+  body-to-body weld). Face rotation moved to six `ee2_grab_{site}` sites so
+  each block face has a single site. Held blocks follow the gripper rigidly
+  because the soft weld alone lagged up to ~20 mm and ~18 degrees.

@@ -117,23 +117,46 @@ class SimBridge:
                 )
 
     def _align_grab_face(
-        self, block_id: str, face: str, gripper_site_id: int
-    ) -> None:
+        self, block_id: str, face: str, gripper: str
+    ) -> Tuple[float, float]:
         """Align a selected block face with the gripper before enabling its weld."""
         block = self.blocks[block_id]
-        block_position = block.get_world_pos()
-        block_rotation = self.data.xmat[block.body_id].reshape(3, 3)
-        local_face_position = self.model.site_pos[
-            block.face_site_ids[face]
-        ].copy()
+        face_site_id = block.face_site_ids[face]
+        gripper_site_id = self.worm.gripper_face_sites[gripper][face]
         gripper_position = self.data.site_xpos[gripper_site_id].copy()
-        aligned_position = gripper_position - block_rotation @ local_face_position
-        current_quat = tuple(
-            self.data.qpos[block.qpos_adr + 3 : block.qpos_adr + 7]
+        gripper_rotation = self.data.site_xmat[gripper_site_id].reshape(3, 3)
+        gripper_quat = np.zeros(4)
+        mujoco.mju_mat2Quat(gripper_quat, gripper_rotation.reshape(9))
+        local_face_position = self.model.site_pos[face_site_id].copy()
+        local_face_quat = self.model.site_quat[face_site_id].copy()
+
+        inverse_local_face_quat = np.zeros(4)
+        aligned_quat = np.zeros(4)
+        aligned_rotation = np.zeros(9)
+        mujoco.mju_negQuat(inverse_local_face_quat, local_face_quat)
+        mujoco.mju_mulQuat(
+            aligned_quat, gripper_quat, inverse_local_face_quat
         )
-        if not np.allclose(aligned_position, block_position):
-            block.set_pose(aligned_position, current_quat)
-            mujoco.mj_forward(self.model, self.data)
+        mujoco.mju_quat2Mat(aligned_rotation, aligned_quat)
+        aligned_position = gripper_position - aligned_rotation.reshape(
+            3, 3
+        ) @ local_face_position
+
+        block.set_pose(aligned_position, tuple(aligned_quat))
+        mujoco.mj_forward(self.model, self.data)
+
+        position_error = float(
+            np.linalg.norm(
+                self.data.site_xpos[gripper_site_id]
+                - self.data.site_xpos[face_site_id]
+            )
+        )
+        face_quat = np.zeros(4)
+        face_rotation = self.data.site_xmat[face_site_id].reshape(3, 3)
+        mujoco.mju_mat2Quat(face_quat, face_rotation.reshape(9))
+        quat_dot = float(np.clip(abs(np.dot(gripper_quat, face_quat)), 0.0, 1.0))
+        angle_error = float(2.0 * np.arccos(quat_dot))
+        return position_error, angle_error
 
     def register_initial_blocks(self) -> None:
         """Register every scene block in the logical grid."""
@@ -240,21 +263,19 @@ class SimBridge:
         self.world_grid.remove_block(grid_coord, enforce_rules=False)
         weld_id = self.weld_ids[(gripper, block_id, face)]
         mujoco.mj_forward(self.model, self.data)
-        self._align_grab_face(
-            block_id, face, self.worm.gripper_sites[gripper]
+        position_error, angle_error = self._align_grab_face(
+            block_id, face, gripper
         )
         self.model.eq_solref[weld_id] = self.worm.soft_solref
         self.data.eq_active[weld_id] = 1
-        aligned_distance = np.linalg.norm(
-            self.data.site_xpos[self.worm.gripper_sites[gripper]]
-            - self.data.site_xpos[self.blocks[block_id].face_site_ids[face]]
-        )
         self.worm.held_blocks[gripper] = (block_id, face)
         self.worm.weld_timers[gripper] = 0.0
         print(
             f"GRABBED {block_id} from {grid_coord} "
             f"via {face} (distance={distance:.4f} m, "
-            f"aligned gap={aligned_distance:.6f} m) - Free motion enabled"
+            f"position error={position_error:.6f} m, "
+            f"angle error={np.degrees(angle_error):.3f} deg) - "
+            "Free motion enabled"
         )
         return block_id
 
@@ -317,8 +338,15 @@ class SimBridge:
         )
         return placed_coord
 
+    def align_held_blocks_to_grippers(self) -> None:
+        """Lock every held block's grabbed face to its gripper site."""
+        for gripper, held in self.worm.held_blocks.items():
+            if held is not None:
+                block_id, face = held
+                self._align_grab_face(block_id, face, gripper)
+
     def step(self) -> None:
-        """Align placed blocks, ramp welds, and advance MuJoCo one step."""
+        """Align blocks to the grid and grippers, ramp welds, and step MuJoCo."""
         mujoco.mj_forward(self.model, self.data)
         self.align_placed_blocks_to_grid()
         mujoco.mj_forward(self.model, self.data)
@@ -341,3 +369,5 @@ class SimBridge:
                     self.worm.hard_solref
                 )
         mujoco.mj_step(self.model, self.data)
+        mujoco.mj_forward(self.model, self.data)
+        self.align_held_blocks_to_grippers()

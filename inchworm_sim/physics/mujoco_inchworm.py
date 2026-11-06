@@ -4,6 +4,8 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import mujoco
 
+from .coords import FACE_TO_SITE
+
 if TYPE_CHECKING:
     from .sim_bridge import SimBridge
 
@@ -26,6 +28,12 @@ class MujocoWorm:
         self.gripper_sites = {"ee2": model.site("ee2_grab").id}
         if model.nsite and self._has_site(model, "ee1_grab"):
             self.gripper_sites["ee1"] = model.site("ee1_grab").id
+        self.gripper_face_sites: Dict[str, Dict[str, int]] = {
+            "ee2": {
+                face: model.site(f"ee2_grab_{site_suffix}").id
+                for face, site_suffix in FACE_TO_SITE.items()
+            }
+        }
         self.joint_ids = [model.joint(name).id for name in self.JOINT_NAMES]
         self.actuator_ids = [model.actuator(name).id for name in self.ACTUATOR_NAMES]
         self.held_blocks: Dict[str, Optional[Tuple[str, str]]] = {"ee2": None}

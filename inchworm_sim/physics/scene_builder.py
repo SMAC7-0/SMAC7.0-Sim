@@ -114,20 +114,13 @@ def build_scene(
             rgba=_format_vector(_BLOCK_COLORS[block_index % len(_BLOCK_COLORS)]),
         )
         for face, site_suffix in FACE_TO_SITE.items():
-            direction = {
-                "+x": (1, 0, 0),
-                "-x": (-1, 0, 0),
-                "+y": (0, 1, 0),
-                "-y": (0, -1, 0),
-                "+z": (0, 0, 1),
-                "-z": (0, 0, -1),
-            }[face]
             ET.SubElement(
                 body,
                 "site",
                 name=f"{block_id}_{site_suffix}",
                 pos=_format_vector(
-                    component * block_spec.edge / 2 for component in direction
+                    component * block_spec.edge / 2
+                    for component in _DIRECTIONS[face]
                 ),
                 size=str(block_spec.site_size),
                 rgba="0 0 0 0",
@@ -138,10 +131,10 @@ def build_scene(
                 equality,
                 "weld",
                 name=f"ee2_{block_id}_{site_suffix}_weld",
-                site1="ee2_grab",
+                site1=f"ee2_grab_{site_suffix}",
                 site2=f"{block_id}_{site_suffix}",
                 active="false",
-                solref="0.002 1",
+                solref="0.1 1",
                 solimp="0.999 0.9999 0.001",
             )
 
