@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 import mujoco
 import numpy as np
 
-from .coords import FACE_TO_SITE
+from inchworm_sim.core.faces import FACES
 
 
 class MujocoBlock:
@@ -19,8 +19,7 @@ class MujocoBlock:
         self.block_id = block_id
         self.body_id = model.body(block_id).id
         self.face_site_ids: Dict[str, int] = {
-            face: model.site(f"{block_id}_{site_suffix}").id
-            for face, site_suffix in FACE_TO_SITE.items()
+            face: model.site(f"{block_id}_{face}").id for face in FACES
         }
         joint_id = model.body_jntadr[self.body_id]
         self.qpos_adr = model.jnt_qposadr[joint_id]
@@ -40,7 +39,7 @@ class MujocoBlock:
 
     def get_grab_site_pos(self) -> np.ndarray:
         """Return the top face position for backward compatibility."""
-        return self.get_face_site_pos("+z")
+        return self.get_face_site_pos("pz")
 
     def set_pose(
         self,

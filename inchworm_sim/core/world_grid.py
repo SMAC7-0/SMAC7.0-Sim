@@ -6,27 +6,9 @@ from typing import Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
 
+from .faces import FACES, HORIZONTAL_FACES, OPPOSITE_FACE, FaceName
 
 GridCoord = Tuple[int, int, int]
-
-# Directions used to inspect and connect the six neighboring cells.
-FACES = {
-    "+x": (1, 0, 0),
-    "-x": (-1, 0, 0),
-    "+y": (0, 1, 0),
-    "-y": (0, -1, 0),
-    "+z": (0, 0, 1),
-    "-z": (0, 0, -1),
-}
-
-OPPOSITE_FACE = {
-    "+x": "-x",
-    "-x": "+x",
-    "+y": "-y",
-    "-y": "+y",
-    "+z": "-z",
-    "-z": "+z",
-}
 
 
 @dataclass
@@ -117,14 +99,13 @@ class WorldGrid:
 
     def _placement_support_reason(self, coord: GridCoord) -> Optional[str]:
         if self.validity.check_vertical_support and coord[2] > 0:
-            if "-z" not in self.get_neighbors(coord):
+            if "nz" not in self.get_neighbors(coord):
                 return f"no supporting block directly below {coord}"
         return None
 
     def _removal_surrounded_reason(self, coord: GridCoord) -> Optional[str]:
-        horizontal_faces = ("+x", "-x", "+y", "-y")
         if self.validity.check_not_surrounded and all(
-            face in self.get_neighbors(coord) for face in horizontal_faces
+            face in self.get_neighbors(coord) for face in HORIZONTAL_FACES
         ):
             return (
                 f"block at {coord} is surrounded on all 4 horizontal sides"
@@ -171,7 +152,7 @@ class WorldGrid:
         return tuple(int(value) for value in coord)
 
     @staticmethod
-    def _face(face: str) -> str:
+    def _face(face: str) -> FaceName:
         """Validate a face name and return it unchanged."""
         if face not in FACES:
             raise ValueError(f"invalid face {face!r}; expected one of {tuple(FACES)}")
@@ -190,7 +171,7 @@ class WorldGrid:
         relative = (position - self.origin_offset) / self.block_edge - 0.5
         return tuple(int(np.floor(value + 0.5)) for value in relative)
 
-    def get_face_world_pos(self, coord: GridCoord, face: str) -> np.ndarray:
+    def get_face_world_pos(self, coord: GridCoord, face: FaceName) -> np.ndarray:
         """Return the world-space center of a cell face."""
         face = self._face(face)
         return self.grid_to_world(coord) + np.asarray(FACES[face], dtype=float) * (
@@ -299,7 +280,7 @@ class WorldGrid:
         surfaces = []
         for coord in self.blocks:
             for face, direction in FACES.items():
-                if face == "-z":
+                if face == "nz":
                     continue
                 adjacent = tuple(coord[index] + direction[index] for index in range(3))
                 if not self.in_bounds(adjacent) or self.is_empty(adjacent):

@@ -1,20 +1,11 @@
-"""Shared physical dimensions and coordinate/name conversions."""
+"""Shared physical dimensions and coordinate conversions for scene generation."""
 
-from typing import Dict, Tuple
+from typing import Tuple
 
 import numpy as np
 
 
 BLOCK_EDGE = 0.0742
-FACES = ("+x", "-x", "+y", "-y", "+z", "-z")
-FACE_TO_SITE: Dict[str, str] = {
-    "+x": "px",
-    "-x": "nx",
-    "+y": "py",
-    "-y": "ny",
-    "+z": "pz",
-    "-z": "nz",
-}
 
 
 def grid_to_world(

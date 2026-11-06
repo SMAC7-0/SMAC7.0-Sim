@@ -8,20 +8,13 @@ from typing import Optional, Tuple
 import mujoco
 import numpy as np
 
+from inchworm_sim.core.faces import FACES, OPPOSITE_FACE
 from inchworm_sim.core.world_grid import WorldGrid
 
-from .mujoco_block import FACE_TO_SITE, MujocoBlock
+from .mujoco_block import MujocoBlock
 from .mujoco_inchworm import MujocoWorm
 
 GridCoord = Tuple[int, int, int]
-OPPOSITE_FACE = {
-    "+x": "-x",
-    "-x": "+x",
-    "+y": "-y",
-    "-y": "+y",
-    "+z": "-z",
-    "-z": "+z",
-}
 
 
 class SimBridge:
@@ -55,11 +48,9 @@ class SimBridge:
             name: MujocoBlock(model, data, name) for name in block_names
         }
         self.weld_ids = {
-            ("ee2", name, face): model.equality(
-                f"ee2_{name}_{FACE_TO_SITE[face]}_weld"
-            ).id
+            ("ee2", name, face): model.equality(f"ee2_{name}_{face}_weld").id
             for name in block_names
-            for face in FACE_TO_SITE
+            for face in FACES
         }
         self.structural_weld_ids = {
             model.equality(equality_id).name: equality_id
@@ -95,11 +86,10 @@ class SimBridge:
                 ).items()
                 if candidate.block_id == neighbor.block_id
             )
-            site = FACE_TO_SITE[face]
-            opposite_site = FACE_TO_SITE[OPPOSITE_FACE[face]]
+            opposite = OPPOSITE_FACE[face]
             candidates = (
-                f"{block_id}_{neighbor.block_id}_{site}_{opposite_site}_weld",
-                f"{neighbor.block_id}_{block_id}_{opposite_site}_{site}_weld",
+                f"{block_id}_{neighbor.block_id}_{face}_{opposite}_weld",
+                f"{neighbor.block_id}_{block_id}_{opposite}_{face}_weld",
                 f"{block_id}_{neighbor.block_id}_weld",
                 f"{neighbor.block_id}_{block_id}_weld",
             )
@@ -204,7 +194,7 @@ class SimBridge:
             )
             for block_id, block in self.blocks.items()
             if block_id in self.world_grid.blocks_by_id
-            for face in FACE_TO_SITE
+            for face in FACES
         ]
         if not distances:
             return None, None, None

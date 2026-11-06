@@ -8,25 +8,11 @@ from itertools import combinations
 from pathlib import Path
 from typing import Iterable, Mapping, Tuple, Union
 
-from .coords import BLOCK_EDGE, FACE_TO_SITE, grid_to_world
+from inchworm_sim.core.faces import FACES, OPPOSITE_FACE
+
+from .coords import BLOCK_EDGE, grid_to_world
 
 GridCoord = Tuple[int, int, int]
-_DIRECTIONS = {
-    "+x": (1, 0, 0),
-    "-x": (-1, 0, 0),
-    "+y": (0, 1, 0),
-    "-y": (0, -1, 0),
-    "+z": (0, 0, 1),
-    "-z": (0, 0, -1),
-}
-_OPPOSITE = {
-    "+x": "-x",
-    "-x": "+x",
-    "+y": "-y",
-    "-y": "+y",
-    "+z": "-z",
-    "-z": "+z",
-}
 _BLOCK_COLORS = (
     (1.0, 0.2, 0.2, 1.0),
     (0.2, 1.0, 0.2, 1.0),
@@ -113,26 +99,25 @@ def build_scene(
             conaffinity="1",
             rgba=_format_vector(_BLOCK_COLORS[block_index % len(_BLOCK_COLORS)]),
         )
-        for face, site_suffix in FACE_TO_SITE.items():
+        for face, direction in FACES.items():
             ET.SubElement(
                 body,
                 "site",
-                name=f"{block_id}_{site_suffix}",
+                name=f"{block_id}_{face}",
                 pos=_format_vector(
-                    component * block_spec.edge / 2
-                    for component in _DIRECTIONS[face]
+                    component * block_spec.edge / 2 for component in direction
                 ),
                 size=str(block_spec.site_size),
                 rgba="0 0 0 0",
                 group="3",
             )
-        for site_suffix in FACE_TO_SITE.values():
+        for face in FACES:
             ET.SubElement(
                 equality,
                 "weld",
-                name=f"ee2_{block_id}_{site_suffix}_weld",
-                site1=f"ee2_grab_{site_suffix}",
-                site2=f"{block_id}_{site_suffix}",
+                name=f"ee2_{block_id}_{face}_weld",
+                site1=f"ee2_grab_{face}",
+                site2=f"{block_id}_{face}",
                 active="false",
                 solref="0.1 1",
                 solimp="0.999 0.9999 0.001",
@@ -151,21 +136,16 @@ def build_scene(
         block_items, 2
     ):
         delta = tuple(coord_b[index] - coord_a[index] for index in range(3))
-        for face, direction in _DIRECTIONS.items():
-            opposite = _OPPOSITE[face]
+        for face, direction in FACES.items():
+            opposite = OPPOSITE_FACE[face]
             is_adjacent = delta == direction
             active = "true" if is_adjacent else "false"
-            site_a = f"{block_a}_{FACE_TO_SITE[face]}"
-            site_b = f"{block_b}_{FACE_TO_SITE[opposite]}"
             ET.SubElement(
                 equality,
                 "weld",
-                name=(
-                    f"{block_a}_{block_b}_"
-                    f"{FACE_TO_SITE[face]}_{FACE_TO_SITE[opposite]}_weld"
-                ),
-                site1=site_a,
-                site2=site_b,
+                name=f"{block_a}_{block_b}_{face}_{opposite}_weld",
+                site1=f"{block_a}_{face}",
+                site2=f"{block_b}_{opposite}",
                 active=active,
                 solref="0.1 1",
                 solimp="0.7 0.9 0.001",

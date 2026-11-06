@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import mujoco
 
-from .coords import FACE_TO_SITE
+from inchworm_sim.core.faces import FACES
 
 if TYPE_CHECKING:
     from .sim_bridge import SimBridge
@@ -30,8 +30,7 @@ class MujocoWorm:
             self.gripper_sites["ee1"] = model.site("ee1_grab").id
         self.gripper_face_sites: Dict[str, Dict[str, int]] = {
             "ee2": {
-                face: model.site(f"ee2_grab_{site_suffix}").id
-                for face, site_suffix in FACE_TO_SITE.items()
+                face: model.site(f"ee2_grab_{face}").id for face in FACES
             }
         }
         self.joint_ids = [model.joint(name).id for name in self.JOINT_NAMES]

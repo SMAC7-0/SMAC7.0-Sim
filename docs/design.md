@@ -9,9 +9,9 @@ actions (move, place, remove) toward a target structure.
 - Grid cells indexed from 0. Block edge = 0.0742 m (just under 3 inches).
 - Horizontal grid coordinates may be negative within the configured bounds;
   height coordinates must have `z >= 0`.
-- Logical faces use `+x`, `-x`, `+y`, `-y`, `+z`, and `-z`.
-  MuJoCo site suffixes use `px`, `nx`, `py`, `ny`, `pz`, and `nz`.
-- Faces: +x, -x, +y, -y, +z, -z
+- Faces are `px`, `nx`, `py`, `ny`, `pz`, and `nz` (positive or negative
+  x, y, z) in logic, MuJoCo site names, and weld names alike. They are
+  defined once in `inchworm_sim/core/faces.py`.
 
 ## Entities
 - Block: id, grid position, face connection
