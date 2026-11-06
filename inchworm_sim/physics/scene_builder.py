@@ -2,20 +2,31 @@
 
 import os
 import tempfile
-from pathlib import Path
-from dataclasses import dataclass
-from typing import Iterable, Mapping, Tuple, Union
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from itertools import combinations
+from pathlib import Path
+from typing import Iterable, Mapping, Tuple, Union
 
 from .coords import BLOCK_EDGE, FACE_TO_SITE, grid_to_world
 
 GridCoord = Tuple[int, int, int]
 _DIRECTIONS = {
     "+x": (1, 0, 0),
+    "-x": (-1, 0, 0),
     "+y": (0, 1, 0),
+    "-y": (0, -1, 0),
     "+z": (0, 0, 1),
+    "-z": (0, 0, -1),
 }
-_OPPOSITE = {"+x": "-x", "+y": "-y", "+z": "-z"}
+_OPPOSITE = {
+    "+x": "-x",
+    "-x": "+x",
+    "+y": "-y",
+    "-y": "+y",
+    "+z": "-z",
+    "-z": "+z",
+}
 _BLOCK_COLORS = (
     (1.0, 0.2, 0.2, 1.0),
     (0.2, 1.0, 0.2, 1.0),
@@ -142,19 +153,27 @@ def build_scene(
         if normalized_coord in positions:
             raise ValueError(f"multiple blocks occupy {normalized_coord}")
         positions[normalized_coord] = block_id
-    for coord, block_id in positions.items():
+    block_items = list(block_positions.items())
+    for (block_a, coord_a), (block_b, coord_b) in combinations(
+        block_items, 2
+    ):
+        delta = tuple(coord_b[index] - coord_a[index] for index in range(3))
         for face, direction in _DIRECTIONS.items():
-            neighbor_coord = tuple(coord[i] + direction[i] for i in range(3))
-            neighbor_id = positions.get(neighbor_coord)
-            if neighbor_id is None:
-                continue
+            opposite = _OPPOSITE[face]
+            is_adjacent = delta == direction
+            active = "true" if is_adjacent else "false"
+            site_a = f"{block_a}_{FACE_TO_SITE[face]}"
+            site_b = f"{block_b}_{FACE_TO_SITE[opposite]}"
             ET.SubElement(
                 equality,
                 "weld",
-                name=f"{block_id}_{neighbor_id}_weld",
-                site1=f"{block_id}_{FACE_TO_SITE[face]}",
-                site2=f"{neighbor_id}_{FACE_TO_SITE[_OPPOSITE[face]]}",
-                active="true",
+                name=(
+                    f"{block_a}_{block_b}_"
+                    f"{FACE_TO_SITE[face]}_{FACE_TO_SITE[opposite]}_weld"
+                ),
+                site1=site_a,
+                site2=site_b,
+                active=active,
                 solref="0.1 1",
                 solimp="0.7 0.9 0.001",
             )

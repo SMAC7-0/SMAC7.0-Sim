@@ -14,6 +14,14 @@ from .mujoco_block import FACE_TO_SITE, MujocoBlock
 from .mujoco_inchworm import MujocoWorm
 
 GridCoord = Tuple[int, int, int]
+OPPOSITE_FACE = {
+    "+x": "-x",
+    "-x": "+x",
+    "+y": "-y",
+    "-y": "+y",
+    "+z": "-z",
+    "-z": "+z",
+}
 
 
 class SimBridge:
@@ -57,7 +65,7 @@ class SimBridge:
             model.equality(equality_id).name: equality_id
             for equality_id in range(model.neq)
             if re.fullmatch(
-                r"block\d+_block\d+_weld",
+                r"block\d+_block\d+_(?:[pn][xyz]_[pn][xyz])?_weld",
                 model.equality(equality_id).name,
             )
         }
@@ -80,15 +88,33 @@ class SimBridge:
         if grid_block is None or grid_block.grid_pos is None:
             return
         for neighbor in self.world_grid.get_neighbors(grid_block.grid_pos).values():
+            face = next(
+                face
+                for face, candidate in self.world_grid.get_neighbors(
+                    grid_block.grid_pos
+                ).items()
+                if candidate.block_id == neighbor.block_id
+            )
+            site = FACE_TO_SITE[face]
+            opposite_site = FACE_TO_SITE[OPPOSITE_FACE[face]]
             candidates = (
+                f"{block_id}_{neighbor.block_id}_{site}_{opposite_site}_weld",
+                f"{neighbor.block_id}_{block_id}_{opposite_site}_{site}_weld",
                 f"{block_id}_{neighbor.block_id}_weld",
                 f"{neighbor.block_id}_{block_id}_weld",
             )
+            connected = False
             for weld_name in candidates:
                 weld_id = self.structural_weld_ids.get(weld_name)
                 if weld_id is not None:
                     self.data.eq_active[weld_id] = 1
+                    connected = True
                     break
+            if not connected:
+                raise RuntimeError(
+                    "No structural weld exists for "
+                    f"{block_id} and {neighbor.block_id} on {face}"
+                )
 
     def _align_grab_face(
         self, block_id: str, face: str, gripper_site_id: int
@@ -210,6 +236,7 @@ class SimBridge:
                 f"is surrounded on all 4 horizontal sides!"
             )
             return None
+        self.detach_block_connections(block_id)
         self.world_grid.remove_block(grid_coord, enforce_rules=False)
         weld_id = self.weld_ids[(gripper, block_id, face)]
         mujoco.mj_forward(self.model, self.data)
@@ -281,6 +308,7 @@ class SimBridge:
         self.blocks[block_id].set_pose(
             self.world_grid.grid_to_world(placed_coord)
         )
+        self.attach_block_connections(block_id)
         self.release_cooldown = self.release_cooldown_duration
         self.worm.held_blocks[gripper] = None
         print(
