@@ -1,36 +1,25 @@
 <mujoco>
-  <asset>
-    <mesh name="block_mesh" file="full-block-simple.stl" scale="0.001 0.001 0.001"/>
-  </asset>
-
+  <!-- Reference definition for one block. Runtime scenes generate one body
+       per logical block from inchworm_sim.physics.scene_builder. -->
   <worldbody>
-    <body name="block1" pos="-0.1 0.02 0.0381">
-      <freejoint/>
-      <geom 
-        type="mesh" 
-        mesh="block_mesh" 
-        mass="0.01" 
-        contype="0" 
-        conaffinity="1" 
-        density="0"
-        group="1"
+    <body name="block_template" pos="0.0371 0.0371 0.0371">
+      <freejoint name="block_template_free"/>
+      <geom
+        name="block_template_geom"
+        type="box"
+        size="0.0371 0.0371 0.0371"
+        mass="0.01"
+        friction="1 0.005 0.0001"
+        contype="1"
+        conaffinity="1"
+        rgba="0.5 0.5 0.5 1"
       />
-
-      <!-- <geom type="box" 
-          size="0.0381 0.0381 0.0381" 
-          mass="0.01"
-          friction="1 0.005 0.0001"
-          contype="1"
-          conaffinity="1"
-          rgba="1 0 0 1"
-      /> -->
-
-      <site
-          name="block1_grab"
-          pos="0 0 0.0381"
-          size="0.005"
-          rgba="0 0 1 0"
-      />
+      <site name="block_template_px" pos="0.0371 0 0" size="0.001" group="3"/>
+      <site name="block_template_nx" pos="-0.0371 0 0" size="0.001" group="3"/>
+      <site name="block_template_py" pos="0 0.0371 0" size="0.001" group="3"/>
+      <site name="block_template_ny" pos="0 -0.0371 0" size="0.001" group="3"/>
+      <site name="block_template_pz" pos="0 0 0.0371" size="0.001" group="3"/>
+      <site name="block_template_nz" pos="0 0 -0.0371" size="0.001" group="3"/>
     </body>
   </worldbody>
 </mujoco>

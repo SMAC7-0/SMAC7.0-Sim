@@ -1,2 +1,13 @@
 # Python packaging artifacts
 *.egg-info/
+
+# Python bytecode, caches, and virtual environments
+*.pyc
+__pycache__/
+.venv/
+
+# Interactive/generated simulator state
+structure.xyz
+models/generated_scene.xml
+.runtime-scene-*.xml
+MJMODEL.TXT

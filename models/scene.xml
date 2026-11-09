@@ -1,3 +1,4 @@
+<!--Base scene: scene_builder adds block bodies, face sites, and welds at runtime.-->
 <mujoco model="inchworm_scene">
   <compiler angle="radian" autolimits="true" meshdir="../assets/meshes/visual"/>
   <option gravity="0 0 -9.81" timestep="0.002"/> 
@@ -18,20 +19,10 @@
         contype="1"
         conaffinity="1"
     />
+    <!-- Fixed demo camera
+    <camera name="main_camera" pos="-0.324 -1.425 0.414" xyaxes="0.917 -0.399 -0.000 0.090 0.206 0.974"/>
+    -->
   </worldbody>
 
   <include file="inchworm.xml"/>
-  <include file="block.xml"/>
-
-  <!-- EE2 block attachment -->
-  <equality>
-    <weld
-        name="ee2_block_weld"
-        site1="ee2_grab"
-        site2="block1_grab"
-        active="false"
-        solref="0.1 1"
-        solimp="0.7 0.9 0.001"
-    />
-  </equality>
 </mujoco>

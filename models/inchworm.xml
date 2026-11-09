@@ -1,5 +1,5 @@
+<!--Inchworm model XML file for MuJoCo simulation.-->
 <mujoco>
-
   <asset>
     <mesh name="ee1_mesh"   file="ee1-inchworm.stl"   scale="0.001 0.001 0.001"/>
     <mesh name="ee2_mesh"   file="ee2-inchworm.stl"   scale="0.001 0.001 0.001"/>
@@ -21,7 +21,7 @@
   </default>
 
   <worldbody>
-    <body name="ee1" pos="0 0 -0.052">
+    <body name="ee1" pos="0.2113 0.0913 -0.053">
       <!-- <freejoint name="root"/> -->
       <geom
         type="mesh"
@@ -97,6 +97,15 @@
                 size="0.005"
                 rgba="0 0 1 0"
             />
+            <!-- Per-face grab frames: each rotates that block face's outward
+                 normal onto ee2_grab +z so ee2_{block}_{face}_weld holds the
+                 cube flush. Suffixes must match FACES in core/faces.py. -->
+            <site name="ee2_grab_px" pos="-0.0025 0.02 0.0802" quat="0.70710678 0 -0.70710678 0" size="0.001" rgba="0 0 0 0" group="3"/>
+            <site name="ee2_grab_nx" pos="-0.0025 0.02 0.0802" quat="0.70710678 0 0.70710678 0" size="0.001" rgba="0 0 0 0" group="3"/>
+            <site name="ee2_grab_py" pos="-0.0025 0.02 0.0802" quat="0.70710678 0.70710678 0 0" size="0.001" rgba="0 0 0 0" group="3"/>
+            <site name="ee2_grab_ny" pos="-0.0025 0.02 0.0802" quat="0.70710678 -0.70710678 0 0" size="0.001" rgba="0 0 0 0" group="3"/>
+            <site name="ee2_grab_pz" pos="-0.0025 0.02 0.0802" quat="1 0 0 0" size="0.001" rgba="0 0 0 0" group="3"/>
+            <site name="ee2_grab_nz" pos="-0.0025 0.02 0.0802" quat="0 1 0 0" size="0.001" rgba="0 0 0 0" group="3"/>
 
           </body>
         </body>
