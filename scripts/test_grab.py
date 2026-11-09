@@ -1,3 +1,8 @@
+"""Grab a block interactively by steering the arm with the viewer controls.
+
+The grab triggers through SimBridge when ee2 is close enough to a block face.
+"""
+
 import time
 from pathlib import Path
 

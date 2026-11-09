@@ -19,6 +19,7 @@ from inchworm_sim.scene_layout import (
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_BLOCK = "block5"
+SHOW_DEBUG_MARKERS = False
 
 
 def _require_movement(result: bool, action: str) -> None:
@@ -61,29 +62,26 @@ def main() -> None:
             target_position = data.site_xpos[target_site].copy()
             ee_position = data.site_xpos[model.site("ee2_grab").id].copy()
 
-            # Debug site markers
-            with viewer.lock():
-                viewer.user_scn.ngeom = 2
-                """Block face marker: green"""
-                mujoco.mjv_initGeom(
-                    viewer.user_scn.geoms[1],
-                    mujoco.mjtGeom.mjGEOM_SPHERE,
-                    np.array([0.008, 0, 0]),
-                    target_position,
-                    np.eye(3).flatten(),
-                    np.array([0, 1, 0, 1]),
-                )
-
-                """EE site marker: red"""
-                mujoco.mjv_initGeom(
-                    viewer.user_scn.geoms[0],
-                    mujoco.mjtGeom.mjGEOM_SPHERE,
-                    np.array([0.012, 0, 0]),
-                    ee_position,
-                    np.eye(3).flatten(),
-                    np.array([1, 0, 0, 1]),
-                )
-
+            if SHOW_DEBUG_MARKERS:
+                with viewer.lock():
+                    viewer.user_scn.ngeom = 2
+                    # Red sphere tracks ee2_grab; green tracks the target face.
+                    mujoco.mjv_initGeom(
+                        viewer.user_scn.geoms[0],
+                        mujoco.mjtGeom.mjGEOM_SPHERE,
+                        np.array([0.012, 0, 0]),
+                        ee_position,
+                        np.eye(3).flatten(),
+                        np.array([1, 0, 0, 1]),
+                    )
+                    mujoco.mjv_initGeom(
+                        viewer.user_scn.geoms[1],
+                        mujoco.mjtGeom.mjGEOM_SPHERE,
+                        np.array([0.008, 0, 0]),
+                        target_position,
+                        np.eye(3).flatten(),
+                        np.array([0, 1, 0, 1]),
+                    )
 
             arm.hold(1.0)
             print(f"Moving to {TARGET_BLOCK}...")
@@ -94,6 +92,10 @@ def main() -> None:
                     )
                 ),
                 "move up",
+            )
+            _require_movement(
+                arm.move_to(target_position + np.array((0.0, 0.0, 0.10))),
+                "move over the target block",
             )
             _require_movement(
                 arm.move_to(target_position + np.array((0.0, 0.0, 0.003))),

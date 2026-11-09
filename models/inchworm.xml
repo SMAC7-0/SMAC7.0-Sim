@@ -1,5 +1,5 @@
+<!--Inchworm model XML file for MuJoCo simulation.-->
 <mujoco>
-
   <asset>
     <mesh name="ee1_mesh"   file="ee1-inchworm.stl"   scale="0.001 0.001 0.001"/>
     <mesh name="ee2_mesh"   file="ee2-inchworm.stl"   scale="0.001 0.001 0.001"/>
