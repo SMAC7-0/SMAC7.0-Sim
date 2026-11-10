@@ -24,10 +24,10 @@ actions (move, place, remove) toward a target structure.
 Step(direction), placeBlock(face), removeBlock(face)
     connect(endeffector), disconnect(endeffector)
 
-## Validity rules (v1)
+## Validity rules
 1. Target cell must be in bounds and empty
 2. Placed block must touch ground or another block
-3. 
+3. Block cannot be removed if another block is ontop of it
 
 ## Layers and ownership
 - core/ (Person A), physics/ (Person B). Core never imports mujoco.
@@ -56,7 +56,7 @@ The screenshot is from `physics-B2`, before the merge. It shows the earlier
   blocks are snapped to their grid cells.
 
 ## Open questions
-- ...
+- How are block orientations addressed, specifically when blocks are rotated?
 
 ## Decisions log
 - 2026-10-22: Initial design in progress
@@ -64,3 +64,4 @@ The screenshot is from `physics-B2`, before the merge. It shows the earlier
   body-to-body weld). Face rotation moved to six `ee2_grab_{site}` sites so
   each block face has a single site. Held blocks follow the gripper rigidly
   because the soft weld alone lagged up to ~20 mm and ~18 degrees.
+- 2026-11-09: Added validity rules and an open question
