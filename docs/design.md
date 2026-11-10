@@ -12,7 +12,7 @@ actions (move, place, remove) toward a target structure.
   height coordinates must have `z >= 0`.
 - Faces are `px`, `nx`, `py`, `ny`, `pz`, and `nz` (positive or negative
   x, y, z) in logic, MuJoCo site names, and weld names alike. They are
-  defined once in `inchworm_sim/core/faces.py`.
+  defined once in `inchworm_sim/bridge/faces.py`.
 ![Block Face Sites Reference](./images/faces_ref.png)
 
 ## Entities
@@ -31,7 +31,7 @@ Step(direction), placeBlock(face), removeBlock(face)
 
 ## Layers and ownership
 - core/ (Person A), physics/ (Person B). Core never imports mujoco.
-- `inchworm_sim.physics.scene_builder` generates scenes with any number of
+- `inchworm_sim.bridge` (`scene_builder`) generates scenes with any number of
   reusable block bodies from logical grid coordinates.
 - `inchworm_sim.scene_layout` owns the starting block IDs and grid coordinates.
   Demo scenes generate MuJoCo block bodies, face sites, and welds at runtime;

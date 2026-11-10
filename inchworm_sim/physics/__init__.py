@@ -29,19 +29,19 @@ def __getattr__(name: str) -> Any:
 
         return Arm
     if name == "SimBridge":
-        from .sim_bridge import SimBridge
+        from inchworm_sim.bridge import SimBridge
 
         return SimBridge
     if name == "build_scene":
-        from .scene_builder import build_scene
+        from inchworm_sim.bridge import build_scene
 
         return build_scene
     if name == "create_temporary_scene":
-        from .scene_builder import create_temporary_scene
+        from inchworm_sim.bridge import create_temporary_scene
 
         return create_temporary_scene
     if name in {"BlockSpec", "DEFAULT_BLOCK_SPEC"}:
-        from .scene_builder import BlockSpec, DEFAULT_BLOCK_SPEC
+        from inchworm_sim.bridge import BlockSpec, DEFAULT_BLOCK_SPEC
 
         return {"BlockSpec": BlockSpec, "DEFAULT_BLOCK_SPEC": DEFAULT_BLOCK_SPEC}[name]
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

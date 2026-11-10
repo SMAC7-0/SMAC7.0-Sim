@@ -6,7 +6,12 @@ from typing import Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
 
-from .faces import FACES, HORIZONTAL_FACES, OPPOSITE_FACE, FaceName
+from inchworm_sim.bridge.faces import (
+    FACES,
+    HORIZONTAL_FACES,
+    OPPOSITE_FACE,
+    FaceName,
+)
 
 GridCoord = Tuple[int, int, int]
 

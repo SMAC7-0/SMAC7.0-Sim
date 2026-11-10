@@ -8,7 +8,7 @@ from itertools import combinations
 from pathlib import Path
 from typing import Iterable, Mapping, Tuple, Union
 
-from inchworm_sim.core.faces import FACES, OPPOSITE_FACE
+from inchworm_sim.bridge.faces import FACES, OPPOSITE_FACE
 
 from .coords import BLOCK_EDGE, grid_to_world
 

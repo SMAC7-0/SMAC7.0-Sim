@@ -8,10 +8,8 @@ import mujoco.viewer
 import numpy as np
 
 from inchworm_sim.core.world_grid import WorldGrid
-from inchworm_sim.physics.coords import BLOCK_EDGE
+from inchworm_sim.bridge import BLOCK_EDGE, SimBridge, create_temporary_scene
 from inchworm_sim.physics.inchworm_ctrl import Arm
-from inchworm_sim.physics.scene_builder import create_temporary_scene
-from inchworm_sim.physics.sim_bridge import SimBridge
 from inchworm_sim.scene_layout import (
     MULTI_BLOCK_DEMO_BLOCKS,
     ORIGIN_OFFSET,

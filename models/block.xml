@@ -1,6 +1,6 @@
 <mujoco>
   <!-- Reference definition for one block. Runtime scenes generate one body
-       per logical block from inchworm_sim.physics.scene_builder. -->
+       per logical block from inchworm_sim.bridge.scene_builder. -->
   <worldbody>
     <body name="block_template" pos="0.0371 0.0371 0.0371">
       <freejoint name="block_template_free"/>

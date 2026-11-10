@@ -2,7 +2,7 @@
 
 from typing import Dict, Tuple
 
-from .physics.coords import BLOCK_EDGE
+from .bridge.coords import BLOCK_EDGE
 
 GridCoord = Tuple[int, int, int]
 ORIGIN_OFFSET = (0.0, 0.0, 0.0)

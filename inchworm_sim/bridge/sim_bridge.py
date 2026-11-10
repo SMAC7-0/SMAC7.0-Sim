@@ -8,11 +8,11 @@ from typing import Optional, Tuple
 import mujoco
 import numpy as np
 
-from inchworm_sim.core.faces import FACES, OPPOSITE_FACE
+from inchworm_sim.bridge.faces import FACES, OPPOSITE_FACE
 from inchworm_sim.core.world_grid import WorldGrid
 
-from .mujoco_block import MujocoBlock
-from .mujoco_inchworm import MujocoWorm
+from inchworm_sim.physics.mujoco_block import MujocoBlock
+from inchworm_sim.physics.mujoco_inchworm import MujocoWorm
 
 GridCoord = Tuple[int, int, int]
 

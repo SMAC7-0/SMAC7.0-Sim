@@ -5,7 +5,7 @@ from typing import Dict, Tuple
 import mujoco
 import numpy as np
 
-from inchworm_sim.core.faces import FACES
+from inchworm_sim.bridge.faces import FACES
 
 
 class MujocoBlock:

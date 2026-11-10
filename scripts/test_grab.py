@@ -11,9 +11,7 @@ import mujoco.viewer
 
 from inchworm_sim.scene_layout import ORIGIN_OFFSET, STARTING_BLOCKS
 from inchworm_sim.core.world_grid import WorldGrid
-from inchworm_sim.physics.coords import BLOCK_EDGE
-from inchworm_sim.physics.scene_builder import create_temporary_scene
-from inchworm_sim.physics.sim_bridge import SimBridge
+from inchworm_sim.bridge import BLOCK_EDGE, SimBridge, create_temporary_scene
 
 
 scene_path = create_temporary_scene(

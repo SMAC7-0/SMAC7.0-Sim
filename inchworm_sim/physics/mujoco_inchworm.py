@@ -4,10 +4,10 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import mujoco
 
-from inchworm_sim.core.faces import FACES
+from inchworm_sim.bridge.faces import FACES
 
 if TYPE_CHECKING:
-    from .sim_bridge import SimBridge
+    from inchworm_sim.bridge.sim_bridge import SimBridge
 
 
 class MujocoWorm:

@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from inchworm_sim.physics.scene_builder import build_scene
+from inchworm_sim.bridge import build_scene
 
 
 ROOT = Path(__file__).resolve().parent.parent
